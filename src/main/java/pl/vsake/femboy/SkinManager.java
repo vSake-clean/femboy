@@ -88,6 +88,11 @@ public final class SkinManager {
 			this.id = id;
 		}
 
+		/** Klucz do zapisu w configu / wyboru w GUI: "styl/plik", np. femboy/5dad…_slim.png. */
+		String key() {
+			return style.id + "/" + name;
+		}
+
 		/** Do /femboy list: skiny z laby.net mają w nazwie hash strony (laby.net/skins/&lt;hash&gt;). */
 		String label() {
 			String base = name.substring(name.lastIndexOf('/') + 1).replaceAll("(?i)\\.png$", "");
@@ -112,6 +117,7 @@ public final class SkinManager {
 		Tu możesz dorzucić własne PNG (64x64 albo 64x32):
 		  femboy/  – skiny dla femboyów
 		  egirl/   – skiny dla e-girls
+		  catboy/  – skiny dla catboyów
 		Potem wpisz w grze: /femboy reload. Twoje skiny dołączają do puli razem z wbudowanymi.
 		Model (chudy/szeroki) rozpoznaje się sam; można go wymusić słowem "slim"
 		albo "wide" w nazwie pliku.
@@ -217,6 +223,15 @@ public final class SkinManager {
 		if (ps != null && "off".equals(ps.style)) return Entry.original(self);
 		try {
 			Style style = styleFor(uuid, ps);
+			// wymuszony konkretny skin: najpierw gracza, potem globalny (GUI „wszyscy”)
+			String forced = ps != null && ps.skin != null ? ps.skin : cfg.skinAll;
+			if (forced != null) {
+				PoolSkin p = findByKey(forced);
+				if (p != null && load(p)) {
+					p.users++;
+					return new Entry(p.style, p, null, p.asset, p.model, self);
+				}
+			}
 			long seed = lookSeed(uuid, ps);
 			if (usesPool(seed)) {
 				PoolSkin p = pick(pool(style), seed);
@@ -256,8 +271,10 @@ public final class SkinManager {
 		FemboyConfig cfg = FemboyMod.CONFIG;
 		if ("femboy".equals(cfg.mode)) return Style.FEMBOY;
 		if ("egirl".equals(cfg.mode)) return Style.EGIRL;
+		if ("catboy".equals(cfg.mode)) return Style.CATBOY;
 		long h = mix64(uuid.getMostSignificantBits() ^ mix64(uuid.getLeastSignificantBits() ^ cfg.seed ^ salt(ps) * 0x94D049BB133111EBL));
-		return (h & 1) == 0 ? Style.FEMBOY : Style.EGIRL;
+		// mix: po równo ze wszystkich stylów (femboy / e-girl / catboy)
+		return Style.values()[(int) Math.floorMod(h, (long) Style.values().length)];
 	}
 
 	public static long lookSeed(UUID uuid, FemboyConfig.PlayerSetting ps) {
@@ -403,18 +420,62 @@ public final class SkinManager {
 		}
 	}
 
-	/** Skanuje pliki od nowa. Zwraca {femboy, egirl}. */
-	public static int[] reloadPool() {
+	/** Skanuje pliki od nowa. Zwraca łączną liczbę skinów we wszystkich pulach. */
+	public static int reloadPool() {
 		invalidateAll();
 		TextureManager tm = MinecraftClient.getInstance().getTextureManager();
 		for (List<PoolSkin> l : POOL.values()) for (PoolSkin p : l) if (p.asset != null) tm.destroyTexture(p.id);
 		POOL.clear();
 		poolScanned = false;
-		return new int[]{poolCount(Style.FEMBOY), poolCount(Style.EGIRL)};
+		int n = 0;
+		for (Style st : Style.values()) n += poolCount(st);
+		return n;
 	}
 
 	public static int poolCount(Style st) {
 		return pool(st).size();
+	}
+
+	// ======================== wybór skina (GUI) ========================
+
+	/** Jeden skin z puli dla GUI: klucz do zapisu, czytelna etykieta i tekstura do podglądu. */
+	public record SkinOption(String key, String label, Style style) {
+	}
+
+	private static PoolSkin findByKey(String key) {
+		if (key == null) return null;
+		int slash = key.indexOf('/');
+		if (slash < 0) return null;
+		Style st = Style.byId(key.substring(0, slash));
+		if (st == null) return null;
+		String name = key.substring(slash + 1);
+		for (PoolSkin p : pool(st)) if (p.name.equals(name)) return p;
+		return null;
+	}
+
+	/** Lista skinów danego stylu do przeglądania w GUI (kolejność jak w puli). */
+	public static List<SkinOption> options(Style st) {
+		List<SkinOption> out = new ArrayList<>();
+		for (PoolSkin p : pool(st)) out.add(new SkinOption(p.key(), p.label(), p.style));
+		return out;
+	}
+
+	/** Czytelna etykieta skina spod klucza (do napisów w GUI); null, jeśli nie ma takiego. */
+	public static String labelOf(String key) {
+		PoolSkin p = findByKey(key);
+		return p == null ? null : p.label();
+	}
+
+	/**
+	 * Tekstura skina do płaskiego podglądu w GUI; null, jeśli w tej klatce nie da się jej wczytać
+	 * (nie na wątku renderowania albo plik się nie wczytał). Wołane z ekranu, na wątku gry.
+	 */
+	public static Identifier previewTexture(String key) {
+		PoolSkin p = findByKey(key);
+		if (p == null) return null;
+		if (p.asset != null) return p.id;
+		if (!RenderSystem.isOnRenderThread()) return null;
+		return load(p) ? p.id : null;
 	}
 
 	/** Ile z puli jest wbudowanych w jar (reszta to własne pliki z config). */
@@ -448,7 +509,7 @@ public final class SkinManager {
 		if (!cfg.self && isSelf(uuid, name)) return null;
 		Entry e = CACHE.get(uuid);
 		Style st = e != null && e.style != null ? e.style : styleFor(uuid, ps);
-		String what = st == Style.FEMBOY ? "femboy" : "e-girl";
+		String what = st.label;
 		if (e == null) return what + " (jeszcze nie widziany)";
 		if (e.asset == null) return null;
 		return what + (e.pool != null ? " (" + e.pool.label() + ")" : " (generowany)");

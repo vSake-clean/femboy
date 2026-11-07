@@ -88,6 +88,63 @@ public final class Painter {
 			if (f == Face.FRONT && (t.equals("lo") || t.equals("up")) && x == 1) return t.equals("lo") && y == h - 1 ? PINK_DARK : PINK;
 			return furTex(fur, f, x, y, salt);
 		};
+		if (n.startsWith("ear_bear_") || n.startsWith("ear_mouse_")) {
+			boolean mouse = n.startsWith("ear_mouse_");
+			return (f, x, y, w, h) -> {
+				// różowy (mysz) albo jaśniejszy (miś) środek na przedniej ścianie
+				boolean inner = f == Face.FRONT && (t.equals("b0") && x == 1 || t.equals("m0") && x >= 1 && x <= 2 && y >= 1);
+				if (inner) return mouse ? PINK : mix(furTex(fur, f, x, y, salt), CREAM, 0.45f);
+				return furTex(fur, f, x, y, salt);
+			};
+		}
+		if (n.startsWith("tail_devil_")) return (f, x, y, w, h) -> {
+			int c = matTex(acc, x, y, salt);
+			return t.equals("spade") || t.equals("point") ? mul(c, 0.85f) : c;
+		};
+		if (n.equals("lock")) return (f, x, y, w, h) -> {
+			if (t.equals("shackle")) return SILVER;
+			if (f == Face.FRONT && x == 1 && y == 1) return GOLD_DARK; // dziurka od klucza
+			return f == Face.FRONT && y == 0 ? GOLD_LIGHT : GOLD;
+		};
+		if (n.equals("spikes")) return (f, x, y, w, h) -> f == Face.TOP || f == Face.FRONT && y == 0 ? 0xFFFFFF : SILVER;
+		if (n.equals("halo")) return (f, x, y, w, h) -> f == Face.TOP ? GOLD_LIGHT : f == Face.BOTTOM ? GOLD : mix(GOLD, GOLD_LIGHT, 0.5f);
+		if (n.startsWith("horn_")) return (f, x, y, w, h) -> {
+			int c = matTex(acc, x, y, salt);
+			return t.equals("h2") ? mix(c, 0xFFFFFF, 0.25f) : t.equals("h0") ? mul(c, 0.8f) : c;
+		};
+		if (n.equals("tiara")) return (f, x, y, w, h) -> {
+			if (t.equals("p_c") && f == Face.FRONT && y == 0) return acc; // klejnot w kolorze dodatków
+			return f == Face.TOP ? GOLD_LIGHT : GOLD;
+		};
+		if (n.equals("flower")) return (f, x, y, w, h) -> t.equals("c") ? GOLD_LIGHT : mix(acc, 0xFFFFFF, f == Face.FRONT ? 0.15f : 0f);
+		if (n.equals("glasses")) return (f, x, y, w, h) -> mul(acc, 0.55f);
+		if (n.equals("mask")) return (f, x, y, w, h) -> {
+			int c = mix(acc, 0xFFFFFF, 0.65f);
+			if (t.startsWith("strap")) return mul(c, 0.85f);
+			return f == Face.FRONT && y == 1 ? mul(c, 0.93f) : c; // zakładka materiału
+		};
+		if (n.startsWith("wing_angel_")) return (f, x, y, w, h) -> {
+			// pióra: jaśniejsze pionowe pasy, końcówki szare
+			int c = (x % 2 == 0) ? SNOW : 0xE6E3DE;
+			return t.equals("w4") || t.equals("w3") && y == h - 1 ? mix(c, 0xBDBAC4, 0.4f) : c;
+		};
+		if (n.startsWith("wing_bat_")) return (f, x, y, w, h) -> {
+			int c = mul(mix(acc, 0x2A202C, 0.55f), 1f);
+			return t.equals("w0") ? mul(c, 0.7f) : (x % 3 == 0) ? mul(c, 0.82f) : c; // „kości” błony
+		};
+		if (n.startsWith("wing_butterfly_")) return (f, x, y, w, h) -> {
+			int c = matTex(acc, x, y, salt);
+			if ((f == Face.FRONT || f == Face.BACK) && (x + y + (t.hashCode() & 1)) % 4 == 0) return 0xFFFFFF; // kropki
+			return x == 0 || x == w - 1 ? mul(c, 0.7f) : c;
+		};
+		if (n.startsWith("warmer_")) {
+			boolean stripes = look.has(Item.ARMS_STRIPES);
+			return (f, x, y, w, h) -> {
+				if (t.equals("cuff")) return mix(acc, 0xFFFFFF, 0.3f);
+				if (f == Face.TOP || f == Face.BOTTOM) return mul(acc, 0.85f);
+				return stripes && y % 2 == 1 ? WHITE : matTex(acc, x, y, salt);
+			};
+		}
 		if (n.startsWith("tail_fox_")) return (f, x, y, w, h) -> t.equals("s3") || t.equals("s4") ? furTex(SNOW, f, x, y, salt) : furTex(fur, f, x, y, salt);
 		if (n.startsWith("tail_wolf_")) return (f, x, y, w, h) -> {
 			int c = furTex(fur, f, x, y, salt);

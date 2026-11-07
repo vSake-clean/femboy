@@ -195,7 +195,7 @@ public final class SkinGenerator {
 
 		Look(Style style, Random r) {
 			this.style = style;
-			boolean fb = style == Style.FEMBOY;
+			boolean fb = style != Style.EGIRL; // catboy rysuje się jak femboy
 
 			skin = rgb(SKIN[weighted(r, SKIN_W)]);
 			skinShade = dark(skin, 0.12);
@@ -759,7 +759,7 @@ public final class SkinGenerator {
 			sideShade(BODY, 0, 7, 0.07);
 			ring(BODY, 7, d1, 0.02);
 			for (Box a : ARMS) ring(a, 10, d1, 0.02);
-			if (L.style == Style.FEMBOY && !striped) { // biały kołnierzyk
+			if (L.style != Style.EGIRL && !striped) { // biały kołnierzyk
 				for (int i = 2; i <= 5; i++) at(BODY, BODY.front(i), 0, WHITE);
 				at(BODY, BODY.front(2), 1, WHITE);
 				at(BODY, BODY.front(5), 1, WHITE);

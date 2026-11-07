@@ -17,7 +17,11 @@ public enum Kit {
 	FOX("fox", "lisek"),
 	WOLF("wolf", "wilczek"),
 	BUNNY("bunny", "króliczek"),
-	FEMBOY("femboy", "femboy");
+	FEMBOY("femboy", "femboy"),
+	BEAR("bear", "miś"),
+	DEVIL("devil", "diabełek"),
+	ANGEL("angel", "aniołek"),
+	FAIRY("fairy", "wróżka");
 
 	public final String id;
 	public final String label;
@@ -33,6 +37,8 @@ public enum Kit {
 		for (Kit kit : values()) if (kit.id.equals(k) || kit.label.equals(k)) return kit;
 		if (k.equals("cat") || k.equals("catgirl")) return CATBOY;
 		if (k.equals("dog") || k.equals("puppyboy") || k.equals("pup")) return PUPPY;
+		if (k.equals("demon") || k.equals("imp")) return DEVIL;
+		if (k.equals("butterfly")) return FAIRY;
 		return null;
 	}
 
@@ -86,6 +92,35 @@ public enum Kit {
 				o.set(Slot.LEGS, LEGS_STRIPES);
 				o.set(Slot.SKIRT, SKIRT);
 				o.color = "pink";
+			}
+			case BEAR -> {
+				o.set(Slot.EARS, EARS_BEAR);
+				o.set(Slot.NECK, NECK_BOW);
+				o.set(Slot.ARMS, ARMS_WARMERS);
+				o.fur = "brown";
+				o.color = "cream";
+			}
+			case DEVIL -> {
+				o.set(Slot.HEAD, HEAD_HORNS);
+				o.set(Slot.TAIL, TAIL_DEVIL);
+				o.set(Slot.NECK, NECK_SPIKES);
+				o.set(Slot.BACK, BACK_BAT);
+				o.set(Slot.LEGS, LEGS_STRIPES);
+				o.color = "red";
+			}
+			case ANGEL -> {
+				o.set(Slot.HEAD, HEAD_HALO);
+				o.set(Slot.BACK, BACK_ANGEL);
+				o.set(Slot.NECK, NECK_BOW);
+				o.set(Slot.LEGS, LEGS_SOCKS);
+				o.color = "white";
+			}
+			case FAIRY -> {
+				o.set(Slot.HEAD, HEAD_TIARA);
+				o.set(Slot.BACK, BACK_BUTTERFLY);
+				o.set(Slot.NECK, NECK_HEART);
+				o.set(Slot.SKIRT, SKIRT);
+				o.color = "lavender";
 			}
 		}
 		return o;
@@ -162,6 +197,33 @@ public enum Kit {
 				if (r.chance(0.4f)) b.set(SKIRT);
 				if (r.chance(0.1f)) b.set(PAWS);
 			}
+			case BEAR -> {
+				b.set(EARS_BEAR);
+				float n = r.nextFloat();
+				b.set(n < 0.4f ? NECK_BOW : n < 0.65f ? NECK_HEART : null);
+				if (r.chance(0.35f)) b.set(PAWS);
+				if (r.chance(0.3f)) b.set(r.chance(0.5f) ? ARMS_WARMERS : ARMS_STRIPES);
+			}
+			case DEVIL -> {
+				b.set(HEAD_HORNS);
+				if (r.chance(0.85f)) b.set(TAIL_DEVIL);
+				b.set(r.chance(0.5f) ? NECK_SPIKES : NECK_LOCK);
+				if (r.chance(0.5f)) b.set(BACK_BAT);
+				if (r.chance(0.35f)) b.set(LEGS_STRIPES);
+			}
+			case ANGEL -> {
+				b.set(HEAD_HALO);
+				if (r.chance(0.75f)) b.set(BACK_ANGEL);
+				float n = r.nextFloat();
+				b.set(n < 0.45f ? NECK_BOW : n < 0.7f ? NECK_HEART : null);
+				if (r.chance(0.3f)) b.set(LEGS_SOCKS);
+			}
+			case FAIRY -> {
+				b.set(BACK_BUTTERFLY);
+				b.set(r.chance(0.5f) ? HEAD_TIARA : HEAD_FLOWER);
+				if (r.chance(0.4f)) b.set(NECK_HEART);
+				if (r.chance(0.3f)) b.set(SKIRT);
+			}
 		}
 		// zawsze co najmniej dwa dodatki – inaczej los wygląda jak "nic nie dostał"
 		if (b.count() < 2) b.set(kit == PUPPY || kit == WOLF ? NECK_TAG : NECK_HEART);
@@ -172,6 +234,12 @@ public enum Kit {
 		int palette = r.pick(Palette.furs(ears, tail));
 		b.fur(wantHair && hair >= 0 ? hair : palette);
 		b.accent(r.pick(Palette.ACCENTS));
+		// drobne nowości z 1.5 – losowane NA KOŃCU, żeby dotychczasowe wyglądy się nie zmieniły
+		float extra = r.nextFloat();
+		if (b.get(Slot.FACE) == null && extra < 0.06f) b.set(FACE_GLASSES);
+		else if (b.get(Slot.FACE) == null && extra < 0.09f) b.set(FACE_MASK);
+		if (b.get(Slot.ARMS) == null && (kit == FEMBOY || kit == CATBOY) && r.chance(0.12f))
+			b.set(r.chance(0.5f) ? ARMS_STRIPES : ARMS_WARMERS);
 		return b.build();
 	}
 }

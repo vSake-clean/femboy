@@ -3,7 +3,7 @@
 	"id": "femboy",
 	"version": "${version}",
 	"name": "Femboy Skins",
-	"description": "Zamienia skiny wszystkich graczy na skiny femboyów i e-girls – tylko u ciebie, po stronie klienta. Komendy: /femboy",
+	"description": "Zamienia skiny wszystkich graczy na femboyów, e-girls i catboyów – tylko u ciebie, po stronie klienta. Uszy, ogony, skrzydła, aureolki, różki, obroże, głaskanie i okno wyboru wyglądu z podglądem (klawisz G). Komendy: /femboy",
 	"authors": [
 		"vsake"
 	],
@@ -19,7 +19,7 @@
 	],
 	"depends": {
 		"fabricloader": ">=0.17.0",
-		"minecraft": "~1.21.11",
+		"minecraft": "${mc_depend}",
 		"java": ">=21",
 		"fabric-api": "*"
 	}

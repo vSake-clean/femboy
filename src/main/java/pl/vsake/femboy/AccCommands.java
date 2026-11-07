@@ -37,7 +37,8 @@ import static pl.vsake.femboy.FemboyCommands.prefix;
 import static pl.vsake.femboy.FemboyCommands.target;
 
 /**
- * /femboy acc … – dodatki 3D: uszy, ogony, obroże/chokery, kokardki, zakolanówki, łapki, spódniczka.
+ * /femboy acc … – dodatki 3D: uszy, ogony, obroże/chokery, ozdoby głowy, okulary/maseczka, skrzydła,
+ * ocieplacze, zakolanówki, łapki, spódniczka.
  * Każdy strój (mój / wszystkich / jednego gracza) zmienia się tymi samymi podkomendami.
  */
 final class AccCommands {
@@ -294,10 +295,10 @@ final class AccCommands {
 		s.sendFeedback(prefix().append(Text.literal("Dodatki – ").formatted(Formatting.WHITE))
 			.append(cfg().acc ? Text.literal("WŁĄCZONE").formatted(Formatting.GREEN) : Text.literal("WYŁĄCZONE").formatted(Formatting.RED))
 			.append(Text.literal(", tryb: ").formatted(Formatting.GRAY)).append(hl(modeName(cfg().accMode))));
-		line(s, "/femboy acc on | off", "uszy, ogony, obroże… włącz / wyłącz");
+		line(s, "/femboy acc on | off", "uszy, ogony, obroże, skrzydła… włącz / wyłącz");
 		line(s, "/femboy acc mode random|same|me", "losowo każdemu / każdemu to samo / tylko ja");
-		line(s, "/femboy acc me <zestaw>", "catboy, puppy, fox, wolf, bunny, femboy");
-		line(s, "/femboy acc me <miejsce> <dodatek>", "np. ears cat, tail fox, neck bell, legs stripes, paws on");
+		line(s, "/femboy acc me <zestaw>", String.join(", ", Kit.ids()));
+		line(s, "/femboy acc me <miejsce> <dodatek>", "np. ears cat, tail devil, head halo, back angel, face glasses, arms stripes");
 		line(s, "/femboy acc me fur | color <kolor>", "futro / dodatki: pink, black, ff88cc, auto…");
 		line(s, "/femboy acc me random | none | auto", "wylosuj / zdejmij wszystko / według trybu");
 		line(s, "/femboy acc all …", "strój dla wszystkich (tryb same)");

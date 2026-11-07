@@ -92,6 +92,12 @@ public final class Anim {
 			case SKIRT_FRONT -> out[0] = -0.85f * Math.max(0f, -Math.min(in.rightLegPitch, in.leftLegPitch));
 			case SKIRT_BACK -> out[0] = 0.85f * Math.max(0f, Math.max(in.rightLegPitch, in.leftLegPitch)) + (in.sneaking ? 0.42f : 0f);
 			case SKIRT_SIDE -> out[2] = -s * 0.04f * walk;
+			case WING -> {
+				// spokojne trzepotanie; przy bieganiu i głaskaniu szybciej i szerzej, przy skradaniu złożone
+				float k = Math.min(1f, 0.25f + 0.6f * walk + pat);
+				out[1] = s * (0.18f + 0.3f * k) * sin(t * (0.08f + 0.25f * k) + phase) - (in.sneaking ? s * -0.35f : 0f);
+				out[2] = s * 0.05f * sin(t * 0.05f + phase);
+			}
 			default -> {
 			}
 		}

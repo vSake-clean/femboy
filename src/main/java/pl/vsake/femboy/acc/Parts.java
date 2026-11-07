@@ -35,7 +35,7 @@ public final class Parts {
 	public enum Fit {ANY, WIDE, SLIM}
 
 	/** Rodzaj animacji (Anim). */
-	public enum Motion {NONE, EAR, EAR_PUPPY, EAR_BUNNY, EAR_BUNNY_TOP, TAIL_CAT, TAIL_BUSHY, TAIL_PUPPY, TAIL_BUNNY, PENDANT, HAIR, SKIRT_FRONT, SKIRT_BACK, SKIRT_SIDE}
+	public enum Motion {NONE, EAR, EAR_PUPPY, EAR_BUNNY, EAR_BUNNY_TOP, TAIL_CAT, TAIL_BUSHY, TAIL_PUPPY, TAIL_BUNNY, PENDANT, HAIR, SKIRT_FRONT, SKIRT_BACK, SKIRT_SIDE, WING}
 
 	public static final class Box {
 		public final String tag;
@@ -187,6 +187,15 @@ public final class Parts {
 			child(l, "ear_bunny_top_" + sd, bunny, 0, -4, 0, -0.22f, 0f, s * 0.1f, 1, Motion.EAR_BUNNY_TOP)
 				.box("up", -1.5f, -3, -0.5f, 3, 3, 1)
 				.box("tip", -1, -4, -0.5f, 2, 1, 1);
+			// misie: małe, okrągłe, szeroko rozstawione
+			root(l, "ear_bear_" + sd, EnumSet.of(EARS_BEAR), Fit.ANY, Anchor.HEAD, s * 3.2f, -7.9f, -0.3f, -0.05f, -s * 0.15f, s * 0.2f, s, Motion.EAR)
+				.box("b0", -1.5f, -2, -0.5f, 3, 2, 1)
+				.box("b1", -1, -3, -0.5f, 2, 1, 1);
+			// mysie: duże, okrągłe „talerzyki”
+			root(l, "ear_mouse_" + sd, EnumSet.of(EARS_MOUSE), Fit.ANY, Anchor.HEAD, s * 3.0f, -7.9f, -0.2f, -0.05f, -s * 0.2f, s * 0.35f, s, Motion.EAR)
+				.box("m0", -2, -3, -0.5f, 4, 3, 1)
+				.box("m1", -1.5f, -4, -0.5f, 3, 1, 1)
+				.box("m2", -1.5f, 0, -0.5f, 3, 1, 1);
 		}
 
 		// ======================== ogony (dół pleców, segmenty jeden za drugim) ========================
@@ -203,12 +212,21 @@ public final class Parts {
 		seg = child(l, "tail_puppy_1", seg, 0, 0, 2.5f, 0.4f, 0, 0, 1, Motion.TAIL_PUPPY).box("s1", -1, -1, -0.5f, 2, 2, 3);
 		child(l, "tail_puppy_2", seg, 0, 0, 2.5f, 0.35f, 0, 0, 2, Motion.TAIL_PUPPY).box("s2", -1, -1, -0.5f, 2, 2, 2);
 
+		// diabelski: cienki, długi, zakończony grotem
+		seg = root(l, "tail_devil_0", EnumSet.of(TAIL_DEVIL), Fit.ANY, Anchor.BODY, 0, 10.5f, 1.8f, -0.9f, 0, 0, 0, Motion.TAIL_CAT)
+			.box("s0", -0.5f, -0.5f, -0.5f, 1, 1, 3);
+		for (int i = 1; i < 5; i++)
+			seg = child(l, "tail_devil_" + i, seg, 0, 0, 2.5f, 0.38f, 0, 0, i, Motion.TAIL_CAT).box("s" + i, -0.5f, -0.5f, -0.5f, 1, 1, 3);
+		child(l, "tail_devil_tip", seg, 0, 0, 2.5f, 0.2f, 0, 0, 5, Motion.TAIL_CAT)
+			.box("spade", -1.5f, -0.5f, -0.5f, 3, 1, 2)
+			.box("point", -0.5f, -0.5f, 1.5f, 1, 1, 1);
+
 		root(l, "tail_bunny", EnumSet.of(TAIL_BUNNY), Fit.ANY, Anchor.BODY, 0, 10.5f, 2.0f, 0, 0, 0, 0, Motion.TAIL_BUNNY)
 			.box("puff", -1.5f, -1.5f, 0, 3, 3, 2)
 			.box("end", -1, -1, 2, 2, 2, 1);
 
 		// ======================== szyja: obroża/choker na górze tułowia + zawieszka z przodu ========================
-		root(l, "collar", EnumSet.of(NECK_BELL, NECK_TAG, NECK_HEART, NECK_BOW), Fit.ANY, Anchor.BODY, 0, 0, 0, 0, 0, 0, 0, Motion.NONE)
+		root(l, "collar", EnumSet.of(NECK_BELL, NECK_TAG, NECK_HEART, NECK_BOW, NECK_LOCK, NECK_SPIKES), Fit.ANY, Anchor.BODY, 0, 0, 0, 0, 0, 0, 0, Motion.NONE)
 			.box("band", -4, 0.5f, -2, 8, 1, 4, 0.45f, 0.12f, 0.45f);
 		root(l, "bell", EnumSet.of(NECK_BELL), Fit.ANY, Anchor.BODY, 0, 1.5f, -2.45f, 0, 0, 0, 0, Motion.PENDANT)
 			.box("bell", -1, -0.1f, -2, 2, 2, 2);
@@ -219,10 +237,66 @@ public final class Parts {
 			.box("bar", -1, 1.6f, -1, 2, 1, 1);
 		heart(root(l, "heart", EnumSet.of(NECK_HEART), Fit.ANY, Anchor.BODY, 0, 1.5f, -2.45f, 0, 0, 0, 0, Motion.PENDANT), -1f);
 		bow(root(l, "neckbow", EnumSet.of(NECK_BOW), Fit.ANY, Anchor.BODY, 0, 1.0f, -2.45f, 0, 0, 0, 0, Motion.NONE), -1f);
+		root(l, "lock", EnumSet.of(NECK_LOCK), Fit.ANY, Anchor.BODY, 0, 1.5f, -2.45f, 0, 0, 0, 0, Motion.PENDANT)
+			.box("shackle", -0.5f, -0.4f, -1, 1, 1, 1)
+			.box("body", -1, 0.6f, -1.2f, 2, 2, 1);
+		Piece spikes = root(l, "spikes", EnumSet.of(NECK_SPIKES), Fit.ANY, Anchor.BODY, 0, 0.5f, -2.5f, 0, 0, 0, 0, Motion.NONE);
+		for (int i = 0; i < 4; i++) spikes.box("sp" + i, -3.5f + i * 2, 0, -0.6f, 1, 1, 1);
 
 		// ======================== włosy: kokardka na czubku głowy / spinka nad prawym okiem ========================
 		bow(root(l, "hairbow", EnumSet.of(HEAD_BOW), Fit.ANY, Anchor.HEAD, 2.6f, -9.0f, -2.4f, -0.15f, -0.2f, 0.3f, 1, Motion.HAIR), -0.5f);
 		heart(root(l, "clip", EnumSet.of(HEAD_CLIP), Fit.ANY, Anchor.HEAD, -2.6f, -7.6f, -4.55f, 0, 0, -0.2f, -1, Motion.HAIR), -1f);
+		// aureolka: złote kółko unoszące się nad głową
+		root(l, "halo", EnumSet.of(HEAD_HALO), Fit.ANY, Anchor.HEAD, 0, -11.5f, 0, 0, 0, 0, 0, Motion.HAIR)
+			.box("n", -3, 0, -3, 6, 1, 1)
+			.box("s", -3, 0, 2, 6, 1, 1)
+			.box("w", -3, 0, -2, 1, 1, 4)
+			.box("e", 2, 0, -2, 1, 1, 4);
+		// diabelskie różki: zakrzywione do środka
+		for (int s : new int[]{-1, 1}) {
+			root(l, s < 0 ? "horn_r" : "horn_l", EnumSet.of(HEAD_HORNS), Fit.ANY, Anchor.HEAD, s * 2.4f, -8.2f, -1.5f, 0.15f, 0, s * 0.35f, s, Motion.HAIR)
+				.box("h0", -1, -1, -1, 2, 1, 2)
+				.box("h1", -0.5f, -2.5f, -0.5f, 1, 2, 1)
+				.box("h2", -0.5f + -s * 0.4f, -3.3f, -0.5f, 1, 1, 1);
+		}
+		// tiara: złoty pasek z trzema ząbkami nad czołem
+		root(l, "tiara", EnumSet.of(HEAD_TIARA), Fit.ANY, Anchor.HEAD, 0, -8.2f, -4.0f, -0.35f, 0, 0, 0, Motion.HAIR)
+			.box("band", -3, -0.5f, -0.5f, 6, 1, 1)
+			.box("p_c", -0.5f, -2.5f, -0.5f, 1, 2, 1)
+			.box("p_r", -2.5f, -1.5f, -0.5f, 1, 1, 1)
+			.box("p_l", 1.5f, -1.5f, -0.5f, 1, 1, 1);
+		// kwiatek nad lewym okiem (spinka jest nad prawym)
+		root(l, "flower", EnumSet.of(HEAD_FLOWER), Fit.ANY, Anchor.HEAD, 2.7f, -7.0f, -4.55f, 0, 0, 0.2f, 1, Motion.HAIR)
+			.box("p_t", -0.5f, -1.5f, -1, 1, 1, 1)
+			.box("p_b", -0.5f, 0.5f, -1, 1, 1, 1)
+			.box("p_r", -1.5f, -0.5f, -1, 1, 1, 1)
+			.box("p_l", 0.5f, -0.5f, -1, 1, 1, 1)
+			.box("c", -0.5f, -0.5f, -1.3f, 1, 1, 1);
+
+		// ======================== twarz: okulary / maseczka (przed warstwą włosów) ========================
+		root(l, "glasses", EnumSet.of(FACE_GLASSES), Fit.ANY, Anchor.HEAD, 0, -4.0f, -4.6f, 0, 0, 0, 0, Motion.HAIR)
+			.box("r_top", -3.5f, -1, -0.5f, 3, 1, 1)
+			.box("r_bot", -3.5f, 1, -0.5f, 3, 1, 1)
+			.box("l_top", 0.5f, -1, -0.5f, 3, 1, 1)
+			.box("l_bot", 0.5f, 1, -0.5f, 3, 1, 1)
+			.box("bridge", -0.5f, -1, -0.5f, 1, 1, 1)
+			.box("arm_r", -4.7f, -1, -0.3f, 1, 1, 5)
+			.box("arm_l", 3.7f, -1, -0.3f, 1, 1, 5);
+		root(l, "mask", EnumSet.of(FACE_MASK), Fit.ANY, Anchor.HEAD, 0, -2.0f, -4.6f, 0, 0, 0, 0, Motion.HAIR)
+			.box("cloth", -3, -1, -0.5f, 6, 3, 1)
+			.box("strap_r", -4.7f, -0.5f, -0.3f, 1, 1, 4)
+			.box("strap_l", 3.7f, -0.5f, -0.3f, 1, 1, 4);
+
+		// ======================== plecy: skrzydła (płaskie panele, trzepoczą) ========================
+		for (int s : new int[]{-1, 1}) {
+			String sd = s < 0 ? "r" : "l";
+			wing(root(l, "wing_angel_" + sd, EnumSet.of(BACK_ANGEL), Fit.ANY, Anchor.BODY, s * 1.5f, 2.0f, 2.3f, 0, s * -0.55f, 0, s, Motion.WING), s,
+				new int[][]{{5, -2, 1}, {7, -1, 3}, {6, 2, 2}, {4, 4, 2}, {2, 6, 1}});
+			wing(root(l, "wing_bat_" + sd, EnumSet.of(BACK_BAT), Fit.ANY, Anchor.BODY, s * 1.5f, 2.0f, 2.3f, 0, s * -0.6f, 0, s, Motion.WING), s,
+				new int[][]{{8, -1, 1}, {7, 0, 2}, {5, 2, 2}, {3, 4, 1}});
+			wing(root(l, "wing_butterfly_" + sd, EnumSet.of(BACK_BUTTERFLY), Fit.ANY, Anchor.BODY, s * 1.2f, 3.0f, 2.3f, 0, s * -0.5f, 0, s, Motion.WING), s,
+				new int[][]{{5, -3, 2}, {6, -1, 2}, {4, 1, 1}, {4, 2, 2}, {3, 4, 1}});
+		}
 
 		// ======================== nogi: zakolanówki (nad warstwą spodni) z gumką u góry ========================
 		for (int s : new int[]{-1, 1}) {
@@ -230,6 +304,20 @@ public final class Parts {
 				0, 0, 0, 0, 0, 0, s, Motion.NONE)
 				.box("sock", -2, 2, -2, 4, 10, 4, 0.35f)
 				.box("cuff", -2, 2, -2, 4, 1, 4, 0.5f, 0.15f, 0.5f);
+		}
+
+		// ======================== ręce: ocieplacze na przedramionach (pod łapkami) ========================
+		for (int s : new int[]{-1, 1}) {
+			Anchor a = s < 0 ? Anchor.RIGHT_ARM : Anchor.LEFT_ARM;
+			String sd = s < 0 ? "r" : "l";
+			float wx = s < 0 ? -3 : -1, sx = s < 0 ? -2 : -1;
+			EnumSet<Item> wm = EnumSet.of(ARMS_WARMERS, ARMS_STRIPES);
+			root(l, "warmer_" + sd + "_wide", wm, Fit.WIDE, a, 0, 0, 0, 0, 0, 0, s, Motion.NONE)
+				.box("knit", wx, 3, -2, 4, 5, 4, 0.3f)
+				.box("cuff", wx, 3, -2, 4, 1, 4, 0.45f, 0.1f, 0.45f);
+			root(l, "warmer_" + sd + "_slim", wm, Fit.SLIM, a, 0, 0, 0, 0, 0, 0, s, Motion.NONE)
+				.box("knit", sx, 3, -2, 3, 5, 4, 0.3f)
+				.box("cuff", sx, 3, -2, 3, 1, 4, 0.45f, 0.1f, 0.45f);
 		}
 
 		// ======================== łapki na dłoniach (dół ręki), osobno dla chudych i szerokich ========================
@@ -267,6 +355,17 @@ public final class Parts {
 		seg = child(l, prefix + "2", seg, 0, 0, 3.5f, curl, 0, 0, 2, Motion.TAIL_BUSHY).box("s2", -2, -2, -0.5f, 4, 4, 4);
 		seg = child(l, prefix + "3", seg, 0, 0, 3.5f, curl, 0, 0, 3, Motion.TAIL_BUSHY).box("s3", -1.5f, -1.5f, -0.5f, 3, 3, 3);
 		child(l, prefix + "4", seg, 0, 0, 2.5f, curl * 0.8f, 0, 0, 4, Motion.TAIL_BUSHY).box("s4", -1, -1, -0.5f, 2, 2, 2);
+	}
+
+	/**
+	 * Skrzydło z poziomych pasków grubości 1 px: każdy wiersz {szerokość, y, wysokość}.
+	 * Rozkłada się od pleców na zewnątrz (prawe skrzydło w -X, lewe w +X).
+	 */
+	private static void wing(Piece p, int side, int[][] rows) {
+		for (int i = 0; i < rows.length; i++) {
+			int w = rows[i][0], y = rows[i][1], h = rows[i][2];
+			p.box("w" + i, side < 0 ? -w : 0, y, -0.5f, w, h, 1);
+		}
 	}
 
 	/** Pikselowe serduszko 3x3 (dwa łuki, środek, czubek), grubości 1 px od z0 do z0+1. */

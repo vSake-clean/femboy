@@ -43,14 +43,21 @@ public final class PatPat {
 	private static final Random RANDOM = Random.create();
 
 	private static KeyBinding key;
+	/** Wspólna kategoria klawiszy moda – rejestrować ją można tylko raz (drugi raz = crash przy starcie). */
+	private static KeyBinding.Category category;
 	private static LivingEntity target;
 	private static long startMs;
 	private static long soundCycle = -1;
 
 	public static void init() {
-		KeyBinding.Category category = KeyBinding.Category.create(Identifier.of(FemboyMod.ID, "main"));
+		category = KeyBinding.Category.create(Identifier.of(FemboyMod.ID, "main"));
 		key = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.femboy.pat", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_R, category));
 		ClientTickEvents.END_CLIENT_TICK.register(PatPat::tick);
+	}
+
+	/** Kategoria „Femboy Skins” w Sterowaniu (po init()). */
+	public static KeyBinding.Category category() {
+		return category;
 	}
 
 	/** Nazwa klawisza do komunikatów (gracz mógł go zmienić w Sterowaniu). */

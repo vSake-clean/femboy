@@ -19,7 +19,7 @@ public final class FemboyConfig {
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
 	public boolean enabled = true;
-	/** femboy | egirl | mix */
+	/** femboy | egirl | catboy | mix */
 	public String mode = "mix";
 	/** skins = pliki PNG (pobrane z laby.net + własne), generated = generator, mix = pół na pół. */
 	public String source = "skins";
@@ -43,6 +43,8 @@ public final class FemboyConfig {
 	public Outfit accMe;
 	/** Strój dla wszystkich w trybie same. */
 	public Outfit accAll = Kit.CATBOY.outfit();
+	/** Wymuszony konkretny skin dla wszystkich (klucz puli "styl/plik"); null = losowanie według trybu. Ustawiane z GUI „wszyscy”. */
+	public String skinAll;
 	/** Zestawy, z których losuje tryb random. */
 	public List<String> accKits = new ArrayList<>(Kit.ids());
 	/** Ziarno losowania dodatków – /femboy acc reroll je zmienia. */
@@ -53,8 +55,10 @@ public final class FemboyConfig {
 	public static final class PlayerSetting {
 		/** Ostatnio widziany nick – tylko dla czytelności pliku. */
 		public String name;
-		/** femboy | egirl | off | null (= według trybu). */
+		/** femboy | egirl | catboy | off | null (= według trybu). */
 		public String style;
+		/** Wymuszony konkretny skin (klucz puli "styl/plik"); null = losowanie z puli według ziarna. */
+		public String skin;
 		/** Zwiększane przez /femboy reroll gracz. */
 		public int salt;
 		/** Własny strój z dodatkami; null = według trybu. */
@@ -76,7 +80,7 @@ public final class FemboyConfig {
 		}
 		if (cfg == null) cfg = new FemboyConfig();
 		if (cfg.players == null) cfg.players = new LinkedHashMap<>();
-		if (!"femboy".equals(cfg.mode) && !"egirl".equals(cfg.mode)) cfg.mode = "mix";
+		if (!"femboy".equals(cfg.mode) && !"egirl".equals(cfg.mode) && !"catboy".equals(cfg.mode)) cfg.mode = "mix";
 		if (!"generated".equals(cfg.source) && !"mix".equals(cfg.source)) cfg.source = "skins";
 		if (!"same".equals(cfg.accMode) && !"me".equals(cfg.accMode)) cfg.accMode = "random";
 		if (cfg.accAll == null) cfg.accAll = Kit.CATBOY.outfit();
@@ -87,6 +91,8 @@ public final class FemboyConfig {
 				Kit k = Kit.byId(id);
 				if (k != null && !kits.contains(k.id)) kits.add(k.id);
 			}
+		// config sprzed 1.5 miał wszystkie 6 starych zestawów włączonych → dołóż nowe (miś, diabełek, aniołek, wróżka)
+		if (kits.size() == 6 && kits.containsAll(List.of("catboy", "puppy", "fox", "wolf", "bunny", "femboy"))) kits = new ArrayList<>(Kit.ids());
 		cfg.accKits = kits.isEmpty() ? new ArrayList<>(Kit.ids()) : kits;
 		cfg.path = path;
 		cfg.save();
@@ -118,6 +124,6 @@ public final class FemboyConfig {
 	/** Usuwa wpis gracza, jeśli nic już w nim nie zostało. */
 	public void tidy(UUID id) {
 		PlayerSetting ps = players.get(id.toString());
-		if (ps != null && ps.style == null && ps.salt == 0 && ps.outfit == null && ps.accSalt == 0) players.remove(id.toString());
+		if (ps != null && ps.style == null && ps.skin == null && ps.salt == 0 && ps.outfit == null && ps.accSalt == 0) players.remove(id.toString());
 	}
 }

@@ -5,7 +5,7 @@ package pl.vsake.femboy.acc;
  * null = brak dodatku w tym miejscu. fur: "auto" = kolor włosów ze skina; color: "auto" = losowy dla każdego.
  */
 public final class Outfit {
-	public String ears, tail, neck, head, legs, paws, skirt;
+	public String ears, tail, neck, head, face, back, arms, legs, paws, skirt;
 	public String fur = "auto";
 	public String color = "pink";
 
@@ -15,6 +15,9 @@ public final class Outfit {
 			case TAIL -> tail;
 			case NECK -> neck;
 			case HEAD -> head;
+			case FACE -> face;
+			case BACK -> back;
+			case ARMS -> arms;
 			case LEGS -> legs;
 			case PAWS -> paws;
 			case SKIRT -> skirt;
@@ -28,6 +31,9 @@ public final class Outfit {
 			case TAIL -> tail = v;
 			case NECK -> neck = v;
 			case HEAD -> head = v;
+			case FACE -> face = v;
+			case BACK -> back = v;
+			case ARMS -> arms = v;
 			case LEGS -> legs = v;
 			case PAWS -> paws = v;
 			case SKIRT -> skirt = v;

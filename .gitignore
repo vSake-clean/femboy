@@ -1,3 +1,5 @@
 run/
 build/
 .gradle/
+docs/img/game/
+__pycache__/

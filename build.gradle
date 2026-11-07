@@ -9,8 +9,21 @@ plugins {
 version = project.mod_version
 group = project.maven_group
 
+// ── wersje Minecrafta ──────────────────────────────────────────────────────
+// Domyślnie budujemy na wersję z gradle.properties. Pod inne wersje podaje się
+// je z linii poleceń, np.:
+//   ./gradlew build -Pmc=1.21.8 -Pyarn=1.21.8+build.1 -Pfabricapi=0.129.0+1.21.8
+// Skrypt tools/build-all.sh sam dobiera numery z meta.fabricmc.net i buduje serię.
+// UWAGA: kod kompiluje się na razie tylko na 1.21.11 – inne wersje wymagają przeniesienia.
+def mcVersion     = (project.findProperty('mc')        ?: project.minecraft_version).toString()
+def yarnVersion   = (project.findProperty('yarn')      ?: project.yarn_mappings).toString()
+def loaderVersion = (project.findProperty('loader')    ?: project.loader_version).toString()
+def fabricVersion = (project.findProperty('fabricapi') ?: project.fabric_version).toString()
+def isDefaultMc   = mcVersion == project.minecraft_version.toString()
+
 base {
-	archivesName = project.archives_base_name
+	// jary różnych wersji mają inną nazwę, więc nie nadpisują się w build/libs
+	archivesName = isDefaultMc ? project.archives_base_name : "${project.archives_base_name}-mc${mcVersion}"
 }
 
 repositories {
@@ -18,22 +31,52 @@ repositories {
 }
 
 dependencies {
-	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+	minecraft "com.mojang:minecraft:${mcVersion}"
+	mappings "net.fabricmc:yarn:${yarnVersion}:v2"
+	modImplementation "net.fabricmc:fabric-loader:${loaderVersion}"
+	modImplementation "net.fabricmc.fabric-api:fabric-api:${fabricVersion}"
+
+	// testy czystej logiki (geometria/tekstura dodatków, losowanie, kolory, pliki skinów) – bez uruchamiania gry
+	testImplementation platform("org.junit:junit-bom:5.11.4")
+	testImplementation "org.junit.jupiter:junit-jupiter"
+	testRuntimeOnly "org.junit.platform:junit-platform-launcher"
+}
+
+// ./gradlew runShots – odpala grę, sama robi zrzuty do docs/img/game/ i się zamyka (patrz dev/ShotDriver).
+// Świat: run/saves/Femboy Shots (dowolny świat 1.21.11 skopiowany pod tę nazwę).
+loom {
+	runs {
+		shots {
+			client()
+			name "Zrzuty do README"
+			vmArg "-Dfemboy.shots=${file('docs/img/game').absolutePath}"
+			programArgs "--width", "1280", "--height", "720", "--quickPlaySingleplayer", "Femboy Shots"
+			runDir "run"
+		}
+	}
+}
+
+test {
+	useJUnitPlatform()
+	testLogging {
+		events "failed"
+		exceptionFormat "full"
+	}
 }
 
 processResources {
 	inputs.property "version", project.version
+	inputs.property "mc", mcVersion
 	filesMatching("fabric.mod.json") {
-		expand "version": project.version
+		// major.minor z budowanej wersji (np. 1.21) → zgodność z całą linią poprawek
+		def mm = (mcVersion =~ /^(\d+\.\d+)/)[0][1]
+		expand "version": project.version, "mc_depend": ">=${mm} <=${mcVersion}"
 	}
 	// Skiny z folderu skins/ (pobrane z laby.net + dorzucone) jadą w jarze:
 	// kto dostanie sam plik .jar, ma je od razu, bez kopiowania folderów.
 	from('skins') {
 		caseSensitive = false
-		include 'femboy/**/*.png', 'egirl/**/*.png', 'laby-*.json'
+		include 'femboy/**/*.png', 'egirl/**/*.png', 'catboy/**/*.png', 'laby-*.json'
 		into 'assets/femboy/skins'
 	}
 }
@@ -63,7 +106,7 @@ tasks.register('deployToFO') {
 	group = 'build'
 	description = 'Wgrywa zbudowany jar do modów Fabulously Optimized'
 	dependsOn 'remapJar'
-	onlyIf { foMods.isDirectory() }
+	onlyIf { isDefaultMc && foMods.isDirectory() }
 	doLast {
 		def src = builtJar.get().asFile.toPath()
 		def dst = foMods.toPath().resolve(src.fileName.toString())

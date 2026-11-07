@@ -53,6 +53,7 @@ public final class FemboyCommands {
 				.executes(c -> msg(c, Text.literal("Tryb: ").append(hl(modeName(cfg().mode)))))
 				.then(literal("femboy").executes(c -> mode(c, "femboy")))
 				.then(literal("egirl").executes(c -> mode(c, "egirl")))
+				.then(literal("catboy").executes(c -> mode(c, "catboy")))
 				.then(literal("mix").executes(c -> mode(c, "mix"))))
 			.then(literal("source")
 				.executes(c -> msg(c, Text.literal("Źródło skinów: ").append(hl(sourceName(cfg().source)))))
@@ -66,6 +67,7 @@ public final class FemboyCommands {
 				.then(argument("gracz", StringArgumentType.word()).suggests(PLAYERS)
 					.then(literal("femboy").executes(c -> setPlayer(c, "femboy")))
 					.then(literal("egirl").executes(c -> setPlayer(c, "egirl")))
+					.then(literal("catboy").executes(c -> setPlayer(c, "catboy")))
 					.then(literal("auto").executes(c -> setPlayer(c, null)))
 					.then(literal("off").executes(c -> setPlayer(c, "off")))))
 			.then(literal("reset")
@@ -82,6 +84,7 @@ public final class FemboyCommands {
 				.executes(c -> export(c, null))
 				.then(argument("gracz", StringArgumentType.word()).suggests(PLAYERS)
 					.executes(c -> export(c, StringArgumentType.getString(c, "gracz")))))
+			.then(literal("gui").executes(FemboyCommands::gui))
 			.then(literal("folder").executes(FemboyCommands::folder))
 			.then(literal("reload").executes(FemboyCommands::reload)));
 	}
@@ -94,14 +97,15 @@ public final class FemboyCommands {
 			.append(cfg().enabled ? Text.literal("WŁĄCZONY").formatted(Formatting.GREEN) : Text.literal("WYŁĄCZONY").formatted(Formatting.RED))
 			.append(Text.literal(", tryb: ").formatted(Formatting.GRAY)).append(hl(modeName(cfg().mode))));
 		line(s, "/femboy on | off | toggle", "włącz / wyłącz");
-		line(s, "/femboy mode femboy|egirl|mix", "kto jaki skin dostaje");
+		line(s, "/femboy mode femboy|egirl|catboy|mix", "kto jaki skin dostaje");
 		line(s, "/femboy source skins|generated|mix", "pobrane skiny / generator / oba");
 		line(s, "/femboy reroll [gracz]", "wylosuj nowe wyglądy");
-		line(s, "/femboy set <gracz> femboy|egirl|auto|off", "wybór dla jednej osoby");
+		line(s, "/femboy set <gracz> femboy|egirl|catboy|auto|off", "wybór dla jednej osoby");
 		line(s, "/femboy reset [gracz]", "usuń ustawienia graczy");
 		line(s, "/femboy self | tab | layers on|off", "ty / lista TAB / warstwy 3D");
 		line(s, "/femboy pat | patsound on|off", "głaskanie: trzymaj " + PatPat.keyName() + ", celując w kogoś / piszczenie");
 		line(s, "/femboy acc", "dodatki: kocie uszy, ogony, obroże, zakolanówki… (" + (cfg().acc ? "włączone" : "wyłączone") + ")");
+		line(s, "/femboy gui", "okno wyboru wyglądu z podglądem (klawisz G)");
 		line(s, "/femboy list | status", "kto co ma / ustawienia");
 		line(s, "/femboy export [gracz]", "zapisz skin do PNG");
 		line(s, "/femboy folder | reload", "dodatkowe własne skiny PNG");
@@ -177,6 +181,7 @@ public final class FemboyCommands {
 			: switch (style) {
 				case "off" -> "oryginalny skin";
 				case "egirl" -> "e-girl";
+				case "catboy" -> "catboy";
 				default -> "femboy";
 			};
 		return msg(c, hl(t.name).append(Text.literal(": " + what).formatted(Formatting.WHITE)));
@@ -252,25 +257,31 @@ public final class FemboyCommands {
 		}
 	}
 
+	private static int gui(CommandContext<FabricClientCommandSource> c) {
+		MinecraftClient mc = MinecraftClient.getInstance();
+		mc.execute(pl.vsake.femboy.gui.FemboyScreen::open);
+		return 1;
+	}
+
 	private static int folder(CommandContext<FabricClientCommandSource> c) {
 		msg(c, Text.literal("Twoje skiny (PNG) wrzucaj do: ").append(fileLink(SkinManager.skinsDir())));
-		return msg(c, Text.literal("Podfolder femboy/ albo egirl/, potem /femboy reload. Skiny z laby.net są już wbudowane w mod.").formatted(Formatting.GRAY));
+		return msg(c, Text.literal("Podfolder femboy/, egirl/ albo catboy/, potem /femboy reload. Skiny z laby.net są już wbudowane w mod.").formatted(Formatting.GRAY));
 	}
 
 	private static int reload(CommandContext<FabricClientCommandSource> c) {
-		int[] n = SkinManager.reloadPool();
+		int n = SkinManager.reloadPool();
 		Accessories.forgetSkins();
 		return msg(c, Text.literal("Wczytano skiny: " + poolSummary()
-			+ (n[0] + n[1] == 0 ? " (brak – używam generatora)" : "")));
+			+ (n == 0 ? " (brak – używam generatora)" : "")));
 	}
 
-	/** "femboy 150 (wbudowane 150, twoje 0), e-girl 150 (wbudowane 150, twoje 0)" */
+	/** "femboy 150 (wbudowane 150, twoje 0), e-girl …, catboy …" */
 	private static String poolSummary() {
 		StringBuilder sb = new StringBuilder();
 		for (Style st : Style.values()) {
 			int all = SkinManager.poolCount(st), inJar = SkinManager.bundledCount(st);
 			if (!sb.isEmpty()) sb.append(", ");
-			sb.append(st == Style.FEMBOY ? "femboy " : "e-girl ").append(all)
+			sb.append(st.label).append(' ').append(all)
 				.append(" (wbudowane ").append(inJar).append(", twoje ").append(all - inJar).append(')');
 		}
 		return sb.toString();
@@ -329,7 +340,8 @@ public final class FemboyCommands {
 		return switch (mode) {
 			case "femboy" -> "femboy";
 			case "egirl" -> "e-girl";
-			default -> "mix (femboy + e-girl)";
+			case "catboy" -> "catboy";
+			default -> "mix (femboy + e-girl + catboy)";
 		};
 	}
 

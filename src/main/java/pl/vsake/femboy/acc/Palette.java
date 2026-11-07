@@ -88,6 +88,8 @@ public final class Palette {
 			case "wolf" -> new int[]{rgb("gray"), rgb("gray"), rgb("black"), rgb("white"), rgb("silver"), rgb("brown")};
 			case "puppy" -> new int[]{rgb("brown"), rgb("brown"), rgb("cream"), rgb("golden"), rgb("white"), rgb("black")};
 			case "bunny" -> new int[]{rgb("white"), rgb("white"), rgb("cream"), rgb("gray"), rgb("brown"), rgb("pink")};
+			case "bear" -> new int[]{rgb("brown"), rgb("brown"), rgb("cream"), rgb("golden"), rgb("white"), rgb("black")};
+			case "mouse" -> new int[]{rgb("gray"), rgb("gray"), rgb("silver"), rgb("white"), rgb("brown"), rgb("black")};
 			default -> new int[]{rgb("black"), rgb("black"), rgb("white"), rgb("gray"), rgb("ginger"), rgb("cream"), rgb("brown"), rgb("pink"), rgb("lavender")};
 		};
 	}
