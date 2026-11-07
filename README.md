@@ -3,19 +3,42 @@
 Mod do Minecrafta (Fabric 1.21.11, tylko klient), który zamienia skiny wszystkich graczy
 na skiny femboyów i e-girls. Zmiana jest widoczna tylko u ciebie.
 
-## Skąd są skiny
+<p align="center">
+  <img src="docs/img/gallery.png" alt="Przykładowe skiny" width="860">
+</p>
 
-- **Domyślnie: prawdziwe skiny z laby.net** – ok. 150 z tagu [Femboy](https://laby.net/skins/tag/Femboy)
-  i 150 z tagu [egirl](https://laby.net/skins/tag/egirl). Są wbudowane w jar: komu dasz sam plik
-  `.jar`, ten ma je od razu, bez kopiowania żadnych folderów.
-- **Generator** – mod sam rysuje wygląd (włosy, oczy, bluza / sweter / mundurek, spódniczka,
-  podkolanówki, buty, dodatki): `/femboy source generated`. `/femboy source mix` = pół na pół.
+## Skiny
+
+Do wyboru masz ok. **300 wbudowanych skinów** (femboy + e-girl, od razu w jarze – komu dasz sam
+plik `.jar`, ten ma je bez kopiowania żadnych folderów), **generator**, który sam rysuje wygląd
+(włosy, oczy, bluza / sweter / mundurek, spódniczka, podkolanówki, buty, dodatki), albo jedno
+i drugie naraz.
+
+- `/femboy source skins` – tylko gotowe skiny
+- `/femboy source generated` – tylko generator
+- `/femboy source mix` – pół na pół
 
 Każdy gracz dostaje skin wylosowany według swojego UUID. Dopóki w puli są wolne skiny, dwie osoby
 nie mają tego samego. Ten sam gracz zwykle ma ten sam skin, dopóki nie zrobisz rerolla
 (jeśli jego skin nosi już ktoś inny, dostaje następny wolny).
 
+**femboy**
+
+<p align="center">
+  <img src="docs/img/femboy-row.png" alt="Skiny femboy" width="900">
+</p>
+
+**e-girl**
+
+<p align="center">
+  <img src="docs/img/egirl-row.png" alt="Skiny e-girl" width="900">
+</p>
+
 ## Pat pat (głaskanie)
+
+<p align="center">
+  <img src="docs/img/petpet-hand.png" alt="Klatki ręki pat pat" width="640">
+</p>
 
 Trzymaj **R**, celując w kogoś (do 6 bloków): nad jego głową pojawia się ręka z GIF-a petpet
 i klepie go, dopóki nie puścisz. Głowa ściska się w rytm klepania jak obrazek w GIF-ie,
@@ -23,6 +46,15 @@ a przy każdym klepnięciu piszczy gumowa zabawka. Działa też na moby (zwierza
 Klawisz zmienisz w Ustawienia → Sterowanie → Przypisane klawisze → Femboy Skins (np. gdy masz Irisa z R na przeładowanie shaderów). Widać to tylko u ciebie (mod działa po stronie klienta).
 
 ## Dodatki (uszy, ogony, obroże…)
+
+<p align="center">
+  <img src="docs/img/fem0.png" alt="" height="200">
+  <img src="docs/img/egi0.png" alt="" height="200">
+  <img src="docs/img/fem1.png" alt="" height="200">
+  <img src="docs/img/egi1.png" alt="" height="200">
+  <img src="docs/img/fem2.png" alt="" height="200">
+  <img src="docs/img/egi2.png" alt="" height="200">
+</p>
 
 Każdy gracz może mieć dodatki 3D – siedzą na postaci i ruszają się razem z nią:
 
@@ -88,15 +120,6 @@ Model chudy / szeroki: słowo `slim` / `wide` w nazwie pliku, a bez niego mod ro
 z pikseli (chudy, jeśli miejsca, których chudy model nie używa, są w większości puste).
 
 Ustawienia: `config/femboy.json`.
-
-## Skiny z laby.net
-
-- Lista z linkami do stron i plików: `skins/laby-femboy.json` i `skins/laby-egirl.json`
-  (w jarze w `assets/femboy/skins/`).
-- Nazwa pliku to `<hash>_slim.png` albo `<hash>_wide.png`. Model jest z laby.net, z jedną poprawką:
-  32 skiny oznaczone tam jako wide są narysowane pod chudy model, więc dostały `_slim`
-  (w JSON `laby_slim` to oryginalna wartość z laby.net).
-- To skiny innych ludzi z laby.net – lista wyżej mówi, skąd który jest.
 
 ## Ręka i dźwięk pat pat
 
