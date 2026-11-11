@@ -10,7 +10,9 @@ import java.util.Locale;
  * obroża / choker (z dzwoneczkiem, kostką, serduszkiem, kokardką), kokardka we włosach, zakolanówki
  * (najlepiej w paski), łapki i plisowana spódniczka. Od 1.5: misie/mysie uszy, diabelski ogonek,
  * chokery z kłódką i ćwiekami, aureolka, różki, tiara, kwiatek, okulary, maseczka, skrzydła
- * (anielskie, nietoperza, motyla) i ocieplacze na ręce.
+ * (anielskie, nietoperza, motyla) i ocieplacze na ręce. Od 1.6: dodatki z dzwoneczkami (dzwonią przy chodzeniu),
+ * obroża z identyfikatorem (nick czytelny z bliska), szalik i stałe efekty nad głową (serduszka, iskierki).
+ * Zakolanówek już nie ma. Od 1.7: zabawki w ręce (myszka / piórko na wędce).
  */
 public enum Item {
 	EARS_CAT(Slot.EARS, "cat", "kocie uszy"),
@@ -20,6 +22,7 @@ public enum Item {
 	EARS_BUNNY(Slot.EARS, "bunny", "królicze uszy"),
 	EARS_BEAR(Slot.EARS, "bear", "misie uszy"),
 	EARS_MOUSE(Slot.EARS, "mouse", "mysie uszy"),
+	EARS_CAT_BELL(Slot.EARS, "catbell", "kocie uszy z dzwoneczkami"),
 
 	TAIL_CAT(Slot.TAIL, "cat", "koci ogon"),
 	TAIL_FOX(Slot.TAIL, "fox", "lisi ogon"),
@@ -34,6 +37,9 @@ public enum Item {
 	NECK_BOW(Slot.NECK, "bow", "choker z kokardką"),
 	NECK_LOCK(Slot.NECK, "lock", "choker z kłódką"),
 	NECK_SPIKES(Slot.NECK, "spikes", "choker z ćwiekami"),
+	NECK_ID(Slot.NECK, "id", "obroża z identyfikatorem"),
+	NECK_BELLS(Slot.NECK, "bells", "obroża z trzema dzwoneczkami"),
+	NECK_SCARF(Slot.NECK, "scarf", "szalik"),
 
 	HEAD_BOW(Slot.HEAD, "bow", "kokardka we włosach"),
 	HEAD_CLIP(Slot.HEAD, "clip", "spinka-serduszko"),
@@ -41,6 +47,7 @@ public enum Item {
 	HEAD_HORNS(Slot.HEAD, "horns", "diabelskie różki"),
 	HEAD_TIARA(Slot.HEAD, "tiara", "tiara"),
 	HEAD_FLOWER(Slot.HEAD, "flower", "kwiatek we włosach"),
+	HEAD_BOW_BELL(Slot.HEAD, "bellbow", "kokardka z dzwoneczkiem"),
 
 	FACE_GLASSES(Slot.FACE, "glasses", "okulary"),
 	FACE_MASK(Slot.FACE, "mask", "maseczka"),
@@ -52,11 +59,16 @@ public enum Item {
 	ARMS_WARMERS(Slot.ARMS, "warmers", "ocieplacze na ręce"),
 	ARMS_STRIPES(Slot.ARMS, "stripes", "ocieplacze w paski"),
 
-	LEGS_SOCKS(Slot.LEGS, "socks", "zakolanówki"),
-	LEGS_STRIPES(Slot.LEGS, "stripes", "zakolanówki w paski"),
-
 	PAWS(Slot.PAWS, "on", "łapki"),
-	SKIRT(Slot.SKIRT, "on", "plisowana spódniczka");
+	SKIRT(Slot.SKIRT, "on", "plisowana spódniczka"),
+
+	// stałe efekty nad głową – bez modelu, same cząsteczki (acc/… → fx/Effects)
+	FX_HEARTS(Slot.FX, "hearts", "serduszka nad głową"),
+	FX_SPARKLES(Slot.FX, "sparkles", "iskierki"),
+
+	// zabawki trzymane w prawej ręce: wędka ze sznurkiem, na końcu coś dynda przy ruchu
+	TOY_MOUSE(Slot.HAND, "mouse", "myszka na wędce"),
+	TOY_FEATHER(Slot.HAND, "feather", "piórko na wędce");
 
 	public final Slot slot;
 	/** Nazwa w komendzie (w obrębie slotu), np. /femboy acc me ears cat. */
@@ -67,6 +79,16 @@ public enum Item {
 		this.slot = slot;
 		this.id = id;
 		this.label = label;
+	}
+
+	/** Ma dzwoneczek – dzwoni przy chodzeniu. */
+	public boolean bell() {
+		return this == NECK_BELL || this == NECK_BELLS || this == HEAD_BOW_BELL || this == EARS_CAT_BELL;
+	}
+
+	/** Kocie uszy (zwykłe albo z dzwoneczkami). */
+	public boolean catEars() {
+		return this == EARS_CAT || this == EARS_CAT_BELL;
 	}
 
 	public static Item of(Slot slot, String id) {
@@ -91,9 +113,10 @@ public enum Item {
 		FACE("face", "twarz", false),
 		BACK("back", "plecy", false),
 		ARMS("arms", "ręce", false),
-		LEGS("legs", "nogi", false),
 		PAWS("paws", "łapki", true),
-		SKIRT("skirt", "spódniczka", true);
+		SKIRT("skirt", "spódniczka", true),
+		FX("fx", "efekt", false),
+		HAND("hand", "w ręce", false);
 
 		public final String id;
 		public final String label;

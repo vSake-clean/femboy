@@ -18,6 +18,7 @@ class PartsTest {
 	@Test
 	void everyItemHasGeometry() {
 		for (Item it : Item.values()) {
+			if (it.slot == Item.Slot.FX) continue; // efekt nad głową to cząsteczki, nie model
 			boolean found = false;
 			for (Parts.Piece p : Parts.PIECES) if (p.items.contains(it)) found = true;
 			assertTrue(found, "brak modelu dla " + it);
@@ -53,6 +54,14 @@ class PartsTest {
 	}
 
 	@Test
+	void detailPiecesAreHalfScale() {
+		// dzwoneczki i identyfikator są w półpikselach – bez skali byłyby dwa razy za duże
+		for (Parts.Piece p : Parts.PIECES)
+			if (p.name.startsWith("jingle_") || p.name.equals(Parts.ID_TAG)) assertEquals(0.5f, p.scale, p.name);
+		assertNotNull(Parts.byName(Parts.ID_TAG));
+	}
+
+	@Test
 	void pieceNamesUnique() {
 		List<String> seen = new ArrayList<>();
 		for (Parts.Piece p : Parts.PIECES) {
@@ -63,7 +72,7 @@ class PartsTest {
 
 	@Test
 	void sidedPiecesComeInPairs() {
-		// uszy, różki, skrzydła, zakolanówki itd. – jeśli jest prawy, musi być lewy
+		// uszy, różki, skrzydła, łapki itd. – jeśli jest prawy, musi być lewy
 		for (Parts.Piece p : Parts.PIECES) {
 			if (p.parent != null || p.side == 0) continue;
 			String other = p.name.contains("_r") ? p.name.replaceFirst("_r(_|$)", "_l$1") : p.name.replaceFirst("_l(_|$)", "_r$1");

@@ -24,5 +24,8 @@ public abstract class BipedEntityModelMixin {
 	@Inject(method = "setAngles(Lnet/minecraft/client/render/entity/state/BipedEntityRenderState;)V", at = @At("RETURN"))
 	private void femboy$patHead(BipedEntityRenderState state, CallbackInfo ci) {
 		PatRender.squishHead(state, head);
+		// animacje ciała (siad, bochenek, przytulas…) – tylko gracze; ten sam kod układa skin, zbroję i nasze dodatki
+		if (state instanceof pl.vsake.femboy.acc.AccessoryRenderState acc)
+			pl.vsake.femboy.fx.PoseRig.apply((BipedEntityModel<?>) (Object) this, acc.femboy$react());
 	}
 }

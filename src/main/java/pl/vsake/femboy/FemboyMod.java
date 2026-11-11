@@ -3,21 +3,24 @@ package pl.vsake.femboy;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRendererRegistrationCallback;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.render.entity.PlayerEntityRenderer;
-import net.minecraft.client.util.InputUtil;
-import net.minecraft.util.Identifier;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pl.vsake.femboy.acc.Accessories;
 import pl.vsake.femboy.acc.AccessoryFeature;
+import pl.vsake.femboy.fx.Clicker;
+import pl.vsake.femboy.fx.Effects;
+import pl.vsake.femboy.fx.Leash;
+import pl.vsake.femboy.fx.Reactions;
 import pl.vsake.femboy.gui.FemboyScreen;
+import pl.vsake.femboy.net.NetClient;
 import pl.vsake.femboy.pat.PatPat;
+import pl.vsake.femboy.voice.Voices;
 
 import java.nio.file.Path;
 
@@ -33,12 +36,29 @@ public final class FemboyMod implements ClientModInitializer {
 		CONFIG = FemboyConfig.load(dir.resolve("femboy.json"));
 		SkinManager.init(dir.resolve("femboy"));
 		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> FemboyCommands.register(dispatcher));
+		// klawisz otwierający GUI wyboru wyglądu (domyślnie G) – pierwszy na liście klawiszy w oknie moda
+		KeyBinding guiKey = Keys.register("Ogólne", "Okno moda", "gui", GLFW.GLFW_KEY_G);
 		PatPat.init();
-		// klawisz otwierający GUI wyboru wyglądu (domyślnie G, zmiana w Sterowaniu)
-		// ta sama kategoria co klawisz głaskania (ponowne Category.create wywalało grę przy starcie)
-		KeyBinding guiKey = KeyBindingHelper.registerKeyBinding(
-			new KeyBinding("key.femboy.gui", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_G, PatPat.category()));
+		// odgłosy (miau, hau…) pod klawiszami – słyszą je inni gracze z modem
+		Voices.init();
+		// moje dodatki i głaskanie dla innych graczy z modem (gdy serwer ma moda) – patrz net/
+		NetClient.init();
+		// emotki nad głową, clicker, smycz, dzwoneczki / mruczenie / serduszka – patrz fx/
+		Reactions.init();
+		Clicker.init();
+		Leash.init();
+		Effects.init();
+		// animacje ciała, boop, przytulas / za ręce / noszenie, zabawki (laser, kłębek), ślady łapek, szafa
+		pl.vsake.femboy.fx.Poses.init();
+		pl.vsake.femboy.fx.Boop.init();
+		pl.vsake.femboy.fx.Bonds.init();
+		pl.vsake.femboy.fx.Toys.init();
+		pl.vsake.femboy.fx.Prints.init();
+		pl.vsake.femboy.fx.WorldDraw.init();
+		Wardrobe.init();
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
+			// okno moda i komunikaty: polski tylko przy polskim języku gry, inaczej angielski
+			Lang.polish = client.getLanguageManager().getLanguage().toLowerCase(java.util.Locale.ROOT).startsWith("pl");
 			while (guiKey.wasPressed()) if (client.player != null) FemboyScreen.open();
 		});
 		// dodatki (uszy, ogony…): dodatkowa warstwa w rendererze gracza, jak zbroja albo peleryna
@@ -58,6 +78,16 @@ public final class FemboyMod implements ClientModInitializer {
 			SkinManager.clearGenerated();
 			Accessories.clear();
 			PatPat.stop();
+			PatPat.clearRemote();
+			Voices.clear();
+			Reactions.clear();
+			Leash.clear();
+			Effects.clear();
+			pl.vsake.femboy.fx.Poses.clear();
+			pl.vsake.femboy.fx.Boop.clear();
+			pl.vsake.femboy.fx.Bonds.clear();
+			pl.vsake.femboy.fx.Toys.clear();
+			pl.vsake.femboy.fx.Prints.clear();
 		}));
 	}
 }

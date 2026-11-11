@@ -5,7 +5,7 @@ package pl.vsake.femboy.acc;
  * null = brak dodatku w tym miejscu. fur: "auto" = kolor włosów ze skina; color: "auto" = losowy dla każdego.
  */
 public final class Outfit {
-	public String ears, tail, neck, head, face, back, arms, legs, paws, skirt;
+	public String ears, tail, neck, head, face, back, arms, paws, skirt, fx, hand;
 	public String fur = "auto";
 	public String color = "pink";
 
@@ -18,9 +18,10 @@ public final class Outfit {
 			case FACE -> face;
 			case BACK -> back;
 			case ARMS -> arms;
-			case LEGS -> legs;
 			case PAWS -> paws;
 			case SKIRT -> skirt;
+			case FX -> fx;
+			case HAND -> hand;
 		};
 	}
 
@@ -34,9 +35,10 @@ public final class Outfit {
 			case FACE -> face = v;
 			case BACK -> back = v;
 			case ARMS -> arms = v;
-			case LEGS -> legs = v;
 			case PAWS -> paws = v;
 			case SKIRT -> skirt = v;
+			case FX -> fx = v;
+			case HAND -> hand = v;
 		}
 	}
 
@@ -79,6 +81,30 @@ public final class Outfit {
 			: Palette.parse(color);
 		b.accent(a >= 0 ? a : Palette.rgb("pink"));
 		return b.build();
+	}
+
+	/** Do pakietu: 11 slotów (po kolei jak Item.Slot, "" = brak) + futro + kolor. */
+	public java.util.List<String> toWire() {
+		java.util.List<String> out = new java.util.ArrayList<>();
+		for (Item.Slot s : Item.Slot.values()) {
+			Item it = item(s);
+			out.add(it == null ? "" : it.id);
+		}
+		out.add(fur == null ? "auto" : fur);
+		out.add(color == null ? "pink" : color);
+		return out;
+	}
+
+	/** Z pakietu od innego gracza; nieznane dodatki (nowsza wersja moda) po prostu pomija. null = zły format. */
+	public static Outfit fromWire(java.util.List<String> w) {
+		Item.Slot[] slots = Item.Slot.values();
+		if (w == null || w.size() != slots.length + 2) return null;
+		Outfit o = new Outfit();
+		for (int i = 0; i < slots.length; i++) o.set(slots[i], Item.of(slots[i], w.get(i)));
+		String f = w.get(slots.length), c = w.get(slots.length + 1);
+		o.fur = "auto".equalsIgnoreCase(f) || Palette.parse(f) < 0 ? "auto" : f;
+		o.color = "auto".equalsIgnoreCase(c) || Palette.parse(c) >= 0 ? c : "pink";
+		return o;
 	}
 
 	public String describeColors() {

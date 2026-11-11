@@ -1,5 +1,7 @@
 package pl.vsake.femboy;
 
+import static pl.vsake.femboy.Lang.tr;
+
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
@@ -510,9 +512,9 @@ public final class SkinManager {
 		Entry e = CACHE.get(uuid);
 		Style st = e != null && e.style != null ? e.style : styleFor(uuid, ps);
 		String what = st.label;
-		if (e == null) return what + " (jeszcze nie widziany)";
+		if (e == null) return what + tr(" (jeszcze nie widziany)");
 		if (e.asset == null) return null;
-		return what + (e.pool != null ? " (" + e.pool.label() + ")" : " (generowany)");
+		return what + (e.pool != null ? " (" + e.pool.label() + ")" : tr(" (generowany)"));
 	}
 
 	private static NativeImage toImage(int[] argb) {

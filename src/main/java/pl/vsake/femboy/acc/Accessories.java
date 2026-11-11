@@ -12,6 +12,7 @@ import net.minecraft.util.Identifier;
 import pl.vsake.femboy.FemboyConfig;
 import pl.vsake.femboy.FemboyMod;
 import pl.vsake.femboy.SkinManager;
+import pl.vsake.femboy.net.NetClient;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -68,7 +69,6 @@ public final class Accessories {
 
 	/** Wywoływane przy wypełnianiu stanu gracza do rysowania (co klatkę). */
 	public static Look lookFor(AbstractClientPlayerEntity player, SkinTextures skin) {
-		if (!FemboyMod.CONFIG.acc) return null;
 		UUID uuid = player.getUuid();
 		Identifier skinId = skin != null && skin.body() != null ? skin.body().texturePath() : null;
 		Seen s = SEEN.get(uuid);
@@ -79,10 +79,24 @@ public final class Accessories {
 		return look;
 	}
 
+	/**
+	 * Wygląd gracza do efektów (dzwoneczki, mruczenie, iskierki) – także wtedy, gdy nikt go akurat nie rysuje
+	 * (np. ja sam w pierwszej osobie). null = nic nie nosi.
+	 */
+	public static Look current(UUID uuid, String name) {
+		Seen s = SEEN.get(uuid);
+		if (s != null && s.version == version) return s.look;
+		// skin zostaje taki, jaki był (albo nieznany) – przy najbliższym rysowaniu lookFor policzy wszystko od nowa, jeśli się zmienił
+		int hair = s == null ? -1 : s.hair;
+		Look look = compute(uuid, name, hair);
+		SEEN.put(uuid, new Seen(version, s == null ? null : s.skin, hair, look));
+		return look;
+	}
+
 	/** Co gracz nosi według ustawień (null = nic). */
 	public static Look compute(UUID uuid, String name, int hair) {
-		if (!FemboyMod.CONFIG.acc) return null;
-		Look look = choose(uuid, name, hair);
+		// /femboy acc off wyłącza tylko losowe/moje przypisane dodatki – to, co gracze z modem sami noszą, widać zawsze
+		Look look = FemboyMod.CONFIG.acc ? choose(uuid, name, hair) : sharedOnly(uuid, name, hair);
 		return look == null || look.isEmpty() ? null : look;
 	}
 
@@ -93,11 +107,20 @@ public final class Accessories {
 		boolean self = SkinManager.isSelf(uuid, name);
 		if (self && cfg.accMe != null) return cfg.accMe.resolve(hair, seed);
 		if (!self && ps != null && ps.outfit != null) return ps.outfit.resolve(hair, seed);
+		// gracz z modem sam wybrał, co nosi – pokazujemy to zamiast losowania (moje ustawienie dla niego wyżej i tak wygrywa)
+		Outfit shared = self ? null : NetClient.shared(uuid);
+		if (shared != null) return shared.resolve(hair, seed);
 		return switch (cfg.accMode) {
 			case "same" -> cfg.accAll.resolve(hair, seed);
 			case "me" -> self ? Kit.random(seed, kits(), hair) : null;
 			default -> Kit.random(seed, kits(), hair);
 		};
+	}
+
+	private static Look sharedOnly(UUID uuid, String name, int hair) {
+		if (SkinManager.isSelf(uuid, name)) return choose(uuid, name, hair); // inni mnie widzą w dodatkach, więc ja też
+		Outfit shared = NetClient.shared(uuid);
+		return shared == null ? null : shared.resolve(hair, seed(uuid, FemboyMod.CONFIG.player(uuid)));
 	}
 
 	/** Ziarno dodatków gracza – inne niż ziarno skina, zmienia je /femboy acc reroll. */
@@ -133,6 +156,25 @@ public final class Accessories {
 		Look now = choose(uuid, name, hair);
 		if (now == null || now.isEmpty()) return new Outfit();
 		return Outfit.of(now, hair >= 0 && now.fur == hair);
+	}
+
+	/** Gracz przysłał nowy strój – policz jego wygląd od nowa. */
+	public static void forget(UUID uuid) {
+		SEEN.remove(uuid);
+	}
+
+	/**
+	 * Mój wygląd do wysłania innym graczom z modem: dokładnie to, co widzę na sobie (ustawiony strój albo losowy zestaw).
+	 * Kolory już rozwiązane, żeby u innych był ten sam; futro "auto" zostaje – u nich weźmie się z włosów skina, który mi dają.
+	 * null = dodatki wyłączone albo nic nie noszę.
+	 */
+	public static Outfit forSharing(UUID self, String name) {
+		FemboyConfig cfg = FemboyMod.CONFIG;
+		int hair = knownHair(self);
+		Look now = choose(self, name, hair);
+		if (now == null || now.isEmpty()) return null;
+		boolean furAuto = cfg.accMe != null ? cfg.accMe.fur == null || "auto".equalsIgnoreCase(cfg.accMe.fur) : hair >= 0 && now.fur == hair;
+		return Outfit.of(now, furAuto);
 	}
 
 	/** Do /femboy list: "kocie uszy, koci ogon, …" albo null. */
@@ -222,6 +264,7 @@ public final class Accessories {
 	/** Po /femboy reload – skiny z plików mogły się zmienić, więc i kolory włosów. */
 	public static void forgetSkins() {
 		HAIR.clear();
+		SEEN.clear(); // kolory włosów czytamy od nowa także tam, gdzie wygląd policzyły już efekty (current)
 		changed();
 	}
 

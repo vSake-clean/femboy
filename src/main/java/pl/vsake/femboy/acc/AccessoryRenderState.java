@@ -5,4 +5,7 @@ public interface AccessoryRenderState {
 	Look femboy$getLook();
 
 	void femboy$setLook(Look look);
+
+	/** Reakcje uszu/ogona, emotka i nick – jeden obiekt na stan, wypełniany co klatkę (fx/Reactions.fill). */
+	pl.vsake.femboy.fx.Reactions.State femboy$react();
 }

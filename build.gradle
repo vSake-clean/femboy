@@ -49,7 +49,9 @@ loom {
 		shots {
 			client()
 			name "Zrzuty do README"
-			vmArg "-Dfemboy.shots=${file('docs/img/game').absolutePath}"
+			// -PshotsDir=… zapisuje gdzie indziej, -PshotsOnly=new robi tylko zrzuty nowości (szybciej przy sprawdzaniu)
+			vmArg "-Dfemboy.shots=${findProperty('shotsDir') ?: file('docs/img/game').absolutePath}"
+			vmArg "-Dfemboy.shots.only=${findProperty('shotsOnly') ?: ''}"
 			programArgs "--width", "1280", "--height", "720", "--quickPlaySingleplayer", "Femboy Shots"
 			runDir "run"
 		}

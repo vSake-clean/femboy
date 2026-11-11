@@ -38,7 +38,7 @@ import static pl.vsake.femboy.FemboyCommands.target;
 
 /**
  * /femboy acc … – dodatki 3D: uszy, ogony, obroże/chokery, ozdoby głowy, okulary/maseczka, skrzydła,
- * ocieplacze, zakolanówki, łapki, spódniczka.
+ * ocieplacze, łapki, spódniczka, efekt nad głową.
  * Każdy strój (mój / wszystkich / jednego gracza) zmienia się tymi samymi podkomendami.
  */
 final class AccCommands {

@@ -89,7 +89,7 @@ public enum Kit {
 			case FEMBOY -> {
 				o.set(Slot.NECK, NECK_HEART);
 				o.set(Slot.HEAD, HEAD_BOW);
-				o.set(Slot.LEGS, LEGS_STRIPES);
+				o.set(Slot.ARMS, ARMS_STRIPES);
 				o.set(Slot.SKIRT, SKIRT);
 				o.color = "pink";
 			}
@@ -105,14 +105,12 @@ public enum Kit {
 				o.set(Slot.TAIL, TAIL_DEVIL);
 				o.set(Slot.NECK, NECK_SPIKES);
 				o.set(Slot.BACK, BACK_BAT);
-				o.set(Slot.LEGS, LEGS_STRIPES);
 				o.color = "red";
 			}
 			case ANGEL -> {
 				o.set(Slot.HEAD, HEAD_HALO);
 				o.set(Slot.BACK, BACK_ANGEL);
 				o.set(Slot.NECK, NECK_BOW);
-				o.set(Slot.LEGS, LEGS_SOCKS);
 				o.color = "white";
 			}
 			case FAIRY -> {
@@ -142,8 +140,7 @@ public enum Kit {
 				float n = r.nextFloat();
 				b.set(n < 0.6f ? NECK_BELL : n < 0.75f ? NECK_HEART : n < 0.85f ? NECK_BOW : null);
 				if (r.chance(0.3f)) b.set(PAWS);
-				float l = r.nextFloat();
-				b.set(l < 0.3f ? LEGS_STRIPES : l < 0.4f ? LEGS_SOCKS : null);
+				r.nextFloat(); // tu losowały się zakolanówki – losowanie zostaje, żeby reszta wyglądu się nie zmieniła
 				if (r.chance(0.15f)) b.set(HEAD_BOW);
 				if (r.chance(0.08f)) b.set(SKIRT);
 			}
@@ -153,8 +150,7 @@ public enum Kit {
 				float n = r.nextFloat();
 				b.set(n < 0.7f ? NECK_TAG : n < 0.8f ? NECK_BELL : n < 0.85f ? NECK_HEART : null);
 				if (r.chance(0.3f)) b.set(PAWS);
-				float l = r.nextFloat();
-				b.set(l < 0.15f ? LEGS_SOCKS : l < 0.3f ? LEGS_STRIPES : null);
+				r.nextFloat(); // tu losowały się zakolanówki – losowanie zostaje, żeby reszta wyglądu się nie zmieniła
 				if (r.chance(0.05f)) b.set(SKIRT);
 			}
 			case FOX -> {
@@ -162,7 +158,7 @@ public enum Kit {
 				if (r.chance(0.9f)) b.set(TAIL_FOX);
 				float n = r.nextFloat();
 				b.set(n < 0.25f ? NECK_HEART : n < 0.4f ? NECK_BOW : n < 0.5f ? NECK_BELL : null);
-				if (r.chance(0.2f)) b.set(LEGS_STRIPES);
+				r.nextFloat(); // dawniej zakolanówki
 				if (r.chance(0.1f)) b.set(HEAD_BOW);
 				if (r.chance(0.08f)) b.set(SKIRT);
 			}
@@ -172,20 +168,19 @@ public enum Kit {
 				float n = r.nextFloat();
 				b.set(n < 0.35f ? NECK_TAG : n < 0.55f ? NECK_HEART : null);
 				if (r.chance(0.2f)) b.set(PAWS);
-				if (r.chance(0.15f)) b.set(LEGS_SOCKS);
+				r.nextFloat(); // dawniej zakolanówki
 			}
 			case BUNNY -> {
 				b.set(EARS_BUNNY);
 				if (r.chance(0.85f)) b.set(TAIL_BUNNY);
 				float n = r.nextFloat();
 				b.set(n < 0.4f ? NECK_BOW : n < 0.6f ? NECK_HEART : null);
-				float l = r.nextFloat();
-				b.set(l < 0.25f ? LEGS_SOCKS : l < 0.4f ? LEGS_STRIPES : null);
+				r.nextFloat(); // tu losowały się zakolanówki – losowanie zostaje, żeby reszta wyglądu się nie zmieniła
 				if (r.chance(0.15f)) b.set(HEAD_BOW);
 				if (r.chance(0.1f)) b.set(SKIRT);
 			}
 			case FEMBOY -> {
-				b.set(r.chance(0.65f) ? LEGS_STRIPES : LEGS_SOCKS);
+				r.nextFloat(); // dawniej zakolanówki
 				float n = r.nextFloat();
 				b.set(n < 0.35f ? NECK_HEART : n < 0.7f ? NECK_BOW : n < 0.8f ? NECK_BELL : null);
 				float h = r.nextFloat();
@@ -209,14 +204,14 @@ public enum Kit {
 				if (r.chance(0.85f)) b.set(TAIL_DEVIL);
 				b.set(r.chance(0.5f) ? NECK_SPIKES : NECK_LOCK);
 				if (r.chance(0.5f)) b.set(BACK_BAT);
-				if (r.chance(0.35f)) b.set(LEGS_STRIPES);
+				r.nextFloat(); // dawniej zakolanówki
 			}
 			case ANGEL -> {
 				b.set(HEAD_HALO);
 				if (r.chance(0.75f)) b.set(BACK_ANGEL);
 				float n = r.nextFloat();
 				b.set(n < 0.45f ? NECK_BOW : n < 0.7f ? NECK_HEART : null);
-				if (r.chance(0.3f)) b.set(LEGS_SOCKS);
+				r.nextFloat(); // dawniej zakolanówki
 			}
 			case FAIRY -> {
 				b.set(BACK_BUTTERFLY);
@@ -227,6 +222,7 @@ public enum Kit {
 		}
 		// zawsze co najmniej dwa dodatki – inaczej los wygląda jak "nic nie dostał"
 		if (b.count() < 2) b.set(kit == PUPPY || kit == WOLF ? NECK_TAG : NECK_HEART);
+		if (b.count() < 2) b.set(kit == PUPPY || kit == WOLF ? PAWS : b.get(Slot.HEAD) == null ? HEAD_BOW : SKIRT);
 		Item ears = b.get(Slot.EARS), tail = b.get(Slot.TAIL);
 		boolean species = kit == FOX || kit == WOLF || kit == BUNNY;
 		// zawsze tyle samo losowań – kolor dodatków nie zmienia się, kiedy skin (a z nim kolor włosów) dopiero się wczyta
@@ -240,6 +236,14 @@ public enum Kit {
 		else if (b.get(Slot.FACE) == null && extra < 0.09f) b.set(FACE_MASK);
 		if (b.get(Slot.ARMS) == null && (kit == FEMBOY || kit == CATBOY) && r.chance(0.12f))
 			b.set(r.chance(0.5f) ? ARMS_STRIPES : ARMS_WARMERS);
+		// nowości z 1.6 (dzwoneczki, identyfikator, szalik) – też na końcu i zawsze dwa losowania
+		float bell = r.nextFloat(), nk = r.nextFloat();
+		if (bell < 0.12f && b.get(Slot.EARS) == EARS_CAT) b.set(EARS_CAT_BELL);
+		else if (bell < 0.3f && b.get(Slot.HEAD) == HEAD_BOW) b.set(HEAD_BOW_BELL);
+		Item neck = b.get(Slot.NECK);
+		if (neck == null && nk < 0.1f) b.set(NECK_SCARF);
+		else if (neck == NECK_TAG && nk < 0.3f) b.set(NECK_ID);
+		else if (neck == NECK_BELL && nk < 0.2f) b.set(NECK_BELLS);
 		return b.build();
 	}
 }

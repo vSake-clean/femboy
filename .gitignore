@@ -3,3 +3,4 @@ build/
 .gradle/
 docs/img/game/
 __pycache__/
+logs/

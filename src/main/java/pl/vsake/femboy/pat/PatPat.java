@@ -1,11 +1,9 @@
 package pl.vsake.femboy.pat;
 
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.sound.PositionedSoundInstance;
-import net.minecraft.client.util.InputUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.projectile.ProjectileUtil;
@@ -20,6 +18,11 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 import org.lwjgl.glfw.GLFW;
 import pl.vsake.femboy.FemboyMod;
+import pl.vsake.femboy.Keys;
+import pl.vsake.femboy.net.NetClient;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Pat pat (petpet): trzymasz klawisz celując w kogoś → ręka z GIF-a petpet klepie go po głowie,
@@ -43,21 +46,58 @@ public final class PatPat {
 	private static final Random RANDOM = Random.create();
 
 	private static KeyBinding key;
-	/** Wspólna kategoria klawiszy moda – rejestrować ją można tylko raz (drugi raz = crash przy starcie). */
-	private static KeyBinding.Category category;
 	private static LivingEntity target;
 	private static long startMs;
 	private static long soundCycle = -1;
 
+	/** Cudze głaskanie (od graczy z modem, przez serwer): kto (id sieciowe) → kogo. */
+	private static final class Remote {
+		final int target;
+		final long startMs;
+		long seenMs;
+		long soundCycle = -1;
+		/** Ile klepnięć tej serii już policzyłem (licznik głaskań – tylko gdy głaskany to ja). */
+		long counted;
+
+		Remote(int target, long now) {
+			this.target = target;
+			this.startMs = now;
+			this.seenMs = now;
+		}
+	}
+
+	private static final Map<Integer, Remote> REMOTE = new HashMap<>();
+	/** Głaszczący odświeża co sekundę – bez odświeżenia przez 3 s uznajemy, że przestał (zgubiony pakiet, wyszedł z zasięgu). */
+	private static final long REMOTE_TIMEOUT_MS = 3000, RESEND_MS = 1000;
+	private static int sentTarget = -1;
+	private static long sentMs;
+
 	public static void init() {
-		category = KeyBinding.Category.create(Identifier.of(FemboyMod.ID, "main"));
-		key = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.femboy.pat", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_R, category));
+		key = Keys.register("Ogólne", "Pat pat (trzymaj)", "pat", GLFW.GLFW_KEY_R);
 		ClientTickEvents.END_CLIENT_TICK.register(PatPat::tick);
 	}
 
-	/** Kategoria „Femboy Skins” w Sterowaniu (po init()). */
-	public static KeyBinding.Category category() {
-		return category;
+	public static KeyBinding key() {
+		return key;
+	}
+
+	/** Czy ktoś (ja albo inny gracz z modem) głaszcze teraz tę istotę – bez skutków ubocznych. */
+	public static boolean patted(LivingEntity e) {
+		if (e == target) return true;
+		if (REMOTE.isEmpty()) return false;
+		int id = e.getId();
+		for (Remote r : REMOTE.values()) if (r.target == id) return true;
+		return false;
+	}
+
+	/** Wszystkie głaskane teraz istoty (każda raz). */
+	public static void forEachPatted(MinecraftClient mc, java.util.function.Consumer<LivingEntity> each) {
+		if (target != null) each.accept(target);
+		if (REMOTE.isEmpty() || mc.world == null) return;
+		java.util.Set<Integer> done = new java.util.HashSet<>();
+		if (target != null) done.add(target.getId());
+		for (Remote r : REMOTE.values())
+			if (done.add(r.target) && mc.world.getEntityById(r.target) instanceof LivingEntity l) each.accept(l);
 	}
 
 	/** Nazwa klawisza do komunikatów (gracz mógł go zmienić w Sterowaniu). */
@@ -66,6 +106,45 @@ public final class PatPat {
 	}
 
 	private static void tick(MinecraftClient mc) {
+		update(mc);
+		sync(mc);
+	}
+
+	/** Mówi serwerowi, kogo głaszczę – przy zmianie i co sekundę, póki głaszczę. */
+	private static void sync(MinecraftClient mc) {
+		int id = target == null || mc.world == null ? -1 : target.getId();
+		long now = Util.getMeasuringTimeMs();
+		if (id == sentTarget && (id < 0 || now - sentMs < RESEND_MS)) return;
+		sentTarget = id;
+		sentMs = now;
+		NetClient.sendPat(id < 0 ? null : target);
+	}
+
+	/** Pakiet od serwera: patter głaszcze target (-1 = przestał). */
+	public static void remote(int patter, int targetId) {
+		long now = Util.getMeasuringTimeMs();
+		if (targetId < 0) {
+			REMOTE.remove(patter);
+			return;
+		}
+		Remote r = REMOTE.get(patter);
+		if (r != null && r.target == targetId) r.seenMs = now;
+		else REMOTE.put(patter, new Remote(targetId, now));
+	}
+
+	/** Po rozłączeniu. */
+	public static void clearRemote() {
+		REMOTE.clear();
+		sentTarget = -1;
+	}
+
+	private static void update(MinecraftClient mc) {
+		if (!REMOTE.isEmpty()) {
+			long now = Util.getMeasuringTimeMs();
+			REMOTE.entrySet().removeIf(en -> now - en.getValue().seenMs > REMOTE_TIMEOUT_MS
+				|| mc.world == null || mc.world.getEntityById(en.getKey()) == null);
+		}
+		countMine(mc);
 		if (!FemboyMod.CONFIG.pat || mc.world == null || mc.player == null || !key.isPressed()) {
 			stop();
 			return;
@@ -85,12 +164,44 @@ public final class PatPat {
 		target = null;
 	}
 
+	private static long patsSavedMs;
+	private static boolean patsDirty;
+
+	/** Licznik głaskań: każde klepnięcie, które ktoś z modem daje MNIE, liczy mój klient (i wysyła innym razem ze strojem). */
+	private static void countMine(MinecraftClient mc) {
+		long now = Util.getMeasuringTimeMs();
+		if (mc.player != null && !REMOTE.isEmpty()) {
+			int me = mc.player.getId();
+			for (Remote r : REMOTE.values()) {
+				if (r.target != me) continue;
+				// liczy się moment, w którym ręka dociska (klatka 4 GIF-a) – wtedy też słychać piśnięcie
+				long done = (Math.min(now, r.seenMs + RESEND_MS) - r.startMs + CYCLE_MS - 4L * FRAME_MS) / CYCLE_MS;
+				if (done > r.counted) {
+					FemboyMod.CONFIG.pats += done - r.counted;
+					r.counted = done;
+					patsDirty = true;
+				}
+			}
+		}
+		if (patsDirty && now - patsSavedMs > 5000) {
+			patsDirty = false;
+			patsSavedMs = now;
+			FemboyMod.CONFIG.save();
+		}
+	}
+
+	/** Licznik głaskań gracza: mój z ustawień, cudzy z tego, co sam przysłał; -1 = nieznany. */
+	public static long count(net.minecraft.entity.player.PlayerEntity p) {
+		MinecraftClient mc = MinecraftClient.getInstance();
+		return p == mc.player ? FemboyMod.CONFIG.pats : NetClient.pats(p.getUuid());
+	}
+
 	private static boolean valid(MinecraftClient mc, LivingEntity e) {
 		return !e.isRemoved() && e.isAlive() && e.getEntityWorld() == mc.world && e.squaredDistanceTo(mc.player) <= KEEP * KEEP;
 	}
 
 	/** Istota pod celownikiem (gracz albo mob), nie dalej niż REACH i nie przez ściany. */
-	private static LivingEntity aim(MinecraftClient mc) {
+	public static LivingEntity aim(MinecraftClient mc) {
 		Entity cam = mc.getCameraEntity();
 		if (cam == null) return null;
 		float tp = mc.getRenderTickCounter().getTickProgress(true);
@@ -111,15 +222,30 @@ public final class PatPat {
 	 * Wołane przy każdym rysowaniu – tu też pada piśnięcie (raz na klepnięcie, gdy ręka dociska).
 	 */
 	public static float timeFor(LivingEntity e) {
-		if (e != target) return -1f;
-		long elapsed = Util.getMeasuringTimeMs() - startMs;
-		long cycle = elapsed / CYCLE_MS;
-		float t = (elapsed % CYCLE_MS) / (float) FRAME_MS;
-		if (t >= 4f && cycle != soundCycle) {
-			soundCycle = cycle;
-			if (FemboyMod.CONFIG.patSound) squeak(e);
+		if (e == target) {
+			long elapsed = Util.getMeasuringTimeMs() - startMs;
+			long cycle = elapsed / CYCLE_MS;
+			float t = (elapsed % CYCLE_MS) / (float) FRAME_MS;
+			if (t >= 4f && cycle != soundCycle) {
+				soundCycle = cycle;
+				if (FemboyMod.CONFIG.patSound) squeak(e);
+			}
+			return t;
 		}
-		return t;
+		if (REMOTE.isEmpty()) return -1f; // cudze głaskanie widać zawsze, nawet z wyłączonym własnym
+		int id = e.getId();
+		for (Remote r : REMOTE.values()) {
+			if (r.target != id) continue;
+			long elapsed = Util.getMeasuringTimeMs() - r.startMs;
+			long cycle = elapsed / CYCLE_MS;
+			float t = (elapsed % CYCLE_MS) / (float) FRAME_MS;
+			if (t >= 4f && cycle != r.soundCycle) {
+				r.soundCycle = cycle;
+				if (FemboyMod.CONFIG.patSound) squeak(e);
+			}
+			return t;
+		}
+		return -1f;
 	}
 
 	private static void squeak(LivingEntity e) {

@@ -15,6 +15,16 @@ import net.minecraft.text.HoverEvent;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import pl.vsake.femboy.fx.Bonds;
+import pl.vsake.femboy.fx.Boop;
+import pl.vsake.femboy.fx.Clicker;
+import pl.vsake.femboy.fx.Pose;
+import pl.vsake.femboy.fx.Poses;
+import pl.vsake.femboy.fx.Toys;
+import pl.vsake.femboy.fx.Trust;
+import pl.vsake.femboy.fx.Emote;
+import pl.vsake.femboy.fx.Leash;
+import pl.vsake.femboy.fx.Reactions;
 import pl.vsake.femboy.acc.Accessories;
 import pl.vsake.femboy.gen.Style;
 import pl.vsake.femboy.pat.PatPat;
@@ -33,7 +43,7 @@ import java.util.function.Consumer;
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.argument;
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
 
-/** /femboy on|off|toggle|status|mode|source|reroll|set|reset|self|tab|layers|pat|patsound|acc|list|export|folder|reload */
+/** /femboy on|off|toggle|status|mode|source|reroll|set|reset|self|tab|layers|pat|patsound|acc|sound|list|export|folder|reload */
 public final class FemboyCommands {
 	private FemboyCommands() {
 	}
@@ -78,7 +88,47 @@ public final class FemboyCommands {
 			.then(flag("layers", "Wymuszanie warstw skina (włosy 3D, spódniczka)", () -> cfg().layers, v -> cfg().layers = v))
 			.then(flag("pat", "Głaskanie (pat pat)", () -> cfg().pat, v -> cfg().pat = v))
 			.then(flag("patsound", "Piszczenie przy głaskaniu", () -> cfg().patSound, v -> cfg().patSound = v))
+			.then(flag("bells", "Dzwoneczki przy chodzeniu", () -> cfg().bells, v -> cfg().bells = v))
+			.then(flag("purr", "Mruczenie głaskanego kota", () -> cfg().patPurr, v -> cfg().patPurr = v))
+			.then(flag("hearts", "Serduszka nad głaskanym", () -> cfg().patHearts, v -> cfg().patHearts = v))
+			.then(flag("react", "Uszy i ogon reagują na odgłosy i obrażenia", () -> cfg().react, v -> cfg().react = v))
+			.then(flag("clicker", "Clicker (słyszę i obracam się do klikającego)", () -> cfg().clicker, v -> cfg().clicker = v)
+				.then(literal("click").executes(c -> Clicker.use() ? 1 : 0)))
+			.then(flag("leashpull", "Daję się ciągnąć na smyczy", () -> cfg().leashPull, v -> cfg().leashPull = v))
+			.then(literal("leash")
+				.executes(c -> msg(c, Text.literal(Leash.leading() == null ? "Nikogo nie prowadzisz na smyczy (klawisz " + Keys.name(Leash.key()) + ", celując w gracza)"
+					: "Prowadzisz na smyczy: " + Leash.leadingName())))
+				.then(literal("off").executes(c -> {
+					Leash.release();
+					return 1;
+				}))
+				.then(argument("gracz", StringArgumentType.word()).suggests(PLAYERS).executes(c -> {
+					Target t = target(c);
+					if (t == null) return 0;
+					Leash.take(t.uuid(), t.name());
+					return 1;
+				})))
+			.then(emotes())
+			.then(poses())
+			.then(pair("boop", (char) 0))
+			.then(pair("hands", Bonds.HANDS))
+			.then(pair("carry", Bonds.CARRY))
+			.then(pair("piggy", Bonds.PIGGY))
+			.then(literal("yarn").executes(c -> Toys.throwYarn() ? 1 : 0))
+			.then(wardrobe())
+			.then(flag("clickerpicked", "Clicker tylko od wybranych osób", () -> cfg().clickerPicked, v -> cfg().clickerPicked = v))
+			.then(flag("leashpicked", "Smycz tylko od wybranych osób", () -> cfg().leashPicked, v -> cfg().leashPicked = v))
+			.then(flag("leashsee", "Widzę smycz na sobie", () -> cfg().leashSeeOwn, v -> cfg().leashSeeOwn = v))
+			.then(flag("yarnfollow", "Gonię cudze kłębki włóczki", () -> cfg().yarnFollow, v -> cfg().yarnFollow = v))
+			.then(flag("laserfollow", "Idę za kropką wskaźnika laserowego", () -> cfg().laserFollow, v -> cfg().laserFollow = v))
+			.then(flag("laserpicked", "Wskaźnik tylko od wybranych osób", () -> cfg().laserPicked, v -> cfg().laserPicked = v))
+			.then(flag("toys", "Widzę cudze zabawki (laser, kłębek)", () -> cfg().toys, v -> cfg().toys = v))
+			.then(flag("pawprints", "Ślady łapek na śniegu i piasku", () -> cfg().pawPrints, v -> cfg().pawPrints = v))
+			.then(flag("blink", "Mruganie", () -> cfg().blink, v -> cfg().blink = v))
+			.then(flag("autopose", "Bochenek i przeciąganie same z siebie", () -> cfg().autoPoses, v -> cfg().autoPoses = v))
+			.then(trust())
 			.then(AccCommands.node())
+			.then(VoiceCommands.node())
 			.then(literal("list").executes(FemboyCommands::list))
 			.then(literal("export")
 				.executes(c -> export(c, null))
@@ -87,6 +137,103 @@ public final class FemboyCommands {
 			.then(literal("gui").executes(FemboyCommands::gui))
 			.then(literal("folder").executes(FemboyCommands::folder))
 			.then(literal("reload").executes(FemboyCommands::reload)));
+	}
+
+	/** /femboy emote <id> – emotka nad głową (jak klawisz). */
+	private static LiteralArgumentBuilder<FabricClientCommandSource> emotes() {
+		LiteralArgumentBuilder<FabricClientCommandSource> n = literal("emote");
+		for (Emote e : Emote.values()) n.then(literal(e.id).executes(c -> Reactions.emote(e) ? 1 : 0));
+		return n;
+	}
+
+	/** /femboy pose <id> | stop – animacja ciała (jak klawisz). */
+	private static LiteralArgumentBuilder<FabricClientCommandSource> poses() {
+		LiteralArgumentBuilder<FabricClientCommandSource> n = literal("pose");
+		for (Pose p : Pose.values()) n.then(literal(p.id).executes(c -> Poses.play(p) ? 1 : 0));
+		n.then(literal("stop").executes(c -> {
+			Poses.stopMine();
+			return 1;
+		}));
+		return n;
+	}
+
+	/** /femboy boop|hands|carry|piggy <gracz> (albo off) – rzeczy we dwoje. kind 0 = boop. */
+	private static LiteralArgumentBuilder<FabricClientCommandSource> pair(String name, char kind) {
+		LiteralArgumentBuilder<FabricClientCommandSource> n = literal(name);
+		if (kind != 0) n.then(literal("off").executes(c -> {
+			Bonds.stop();
+			return 1;
+		}));
+		return n.then(argument("gracz", StringArgumentType.word()).suggests(PLAYERS).executes(c -> {
+			Target t = target(c);
+			if (t == null) return 0;
+			if (kind == 0) return Boop.use(t.uuid()) ? 1 : 0;
+			Bonds.start(kind, t.uuid(), t.name());
+			return 1;
+		}));
+	}
+
+	/** /femboy wardrobe [save <nazwa> | wear <nazwa> | remove <nazwa> | next] – szafa ze strojami. */
+	private static LiteralArgumentBuilder<FabricClientCommandSource> wardrobe() {
+		com.mojang.brigadier.suggestion.SuggestionProvider<FabricClientCommandSource> names = (c, b) -> {
+			for (FemboyConfig.Saved sv : Wardrobe.all()) if (sv.name.indexOf(' ') < 0) b.suggest(sv.name);
+			return b.buildFuture();
+		};
+		return literal("wardrobe")
+			.executes(c -> {
+				StringBuilder sb = new StringBuilder();
+				for (FemboyConfig.Saved sv : Wardrobe.all()) sb.append(sb.isEmpty() ? "" : ", ").append(sv.name);
+				return msg(c, Text.literal("Szafa (" + Wardrobe.all().size() + "/" + Wardrobe.MAX + "): ").append(hl(sb.isEmpty() ? "pusta" : sb.toString())));
+			})
+			.then(literal("next").executes(c -> {
+				Wardrobe.next();
+				return 1;
+			}))
+			.then(literal("save").then(argument("nazwa", StringArgumentType.greedyString()).executes(c -> {
+				MinecraftClient mc = MinecraftClient.getInstance();
+				if (mc.player == null) return 0;
+				UUID me = mc.player.getUuid();
+				String nm = mc.player.getGameProfile().name();
+				FemboyConfig.PlayerSetting ps = cfg().player(me);
+				pl.vsake.femboy.acc.Outfit o = cfg().accMe != null ? cfg().accMe.copy() : pl.vsake.femboy.acc.Accessories.editable(me, nm);
+				int i = Wardrobe.save(StringArgumentType.getString(c, "nazwa"), o, ps == null ? null : ps.skin);
+				return msg(c, i < 0 ? Text.literal("Szafa jest pełna").formatted(Formatting.RED) : Text.literal("Zapisano strój: ").append(hl(Wardrobe.all().get(i).name)));
+			})))
+			.then(literal("wear").then(argument("nazwa", StringArgumentType.greedyString()).suggests(names).executes(c -> {
+				FemboyConfig.Saved sv = Wardrobe.byName(StringArgumentType.getString(c, "nazwa"));
+				if (sv == null) return msg(c, Text.literal("Nie ma takiego stroju w szafie").formatted(Formatting.RED));
+				return Wardrobe.wear(Wardrobe.all().indexOf(sv)) ? 1 : 0;
+			})))
+			.then(literal("remove").then(argument("nazwa", StringArgumentType.greedyString()).suggests(names).executes(c -> {
+				FemboyConfig.Saved sv = Wardrobe.byName(StringArgumentType.getString(c, "nazwa"));
+				if (sv == null) return msg(c, Text.literal("Nie ma takiego stroju w szafie").formatted(Formatting.RED));
+				Wardrobe.remove(Wardrobe.all().indexOf(sv));
+				return msg(c, Text.literal("Usunięto strój: ").append(hl(sv.name)));
+			})));
+	}
+
+	/** /femboy trust clicker|leash|laser|carry <gracz> on|off – na kogo reaguję. */
+	private static LiteralArgumentBuilder<FabricClientCommandSource> trust() {
+		LiteralArgumentBuilder<FabricClientCommandSource> n = literal("trust");
+		for (Trust.What w : Trust.What.values()) {
+			String id = w.name().toLowerCase(java.util.Locale.ROOT);
+			n.then(literal(id).then(argument("gracz", StringArgumentType.word()).suggests(PLAYERS)
+				.executes(c -> {
+					Target t = target(c);
+					if (t == null) return 0;
+					return msg(c, Text.literal(id + " – " + t.name() + ": ").append(onOff(Trust.picked(w, t.uuid()))));
+				})
+				.then(literal("on").executes(c -> setTrust(c, w, true)))
+				.then(literal("off").executes(c -> setTrust(c, w, false)))));
+		}
+		return n;
+	}
+
+	private static int setTrust(CommandContext<FabricClientCommandSource> c, Trust.What w, boolean on) {
+		Target t = target(c);
+		if (t == null) return 0;
+		Trust.setPicked(w, t.uuid(), t.name(), on);
+		return msg(c, Text.literal(w.name().toLowerCase(java.util.Locale.ROOT) + " – " + t.name() + ": ").append(onOff(on)));
 	}
 
 	// ======================== komendy ========================
@@ -104,8 +251,18 @@ public final class FemboyCommands {
 		line(s, "/femboy reset [gracz]", "usuń ustawienia graczy");
 		line(s, "/femboy self | tab | layers on|off", "ty / lista TAB / warstwy 3D");
 		line(s, "/femboy pat | patsound on|off", "głaskanie: trzymaj " + PatPat.keyName() + ", celując w kogoś / piszczenie");
-		line(s, "/femboy acc", "dodatki: kocie uszy, ogony, obroże, zakolanówki… (" + (cfg().acc ? "włączone" : "wyłączone") + ")");
-		line(s, "/femboy gui", "okno wyboru wyglądu z podglądem (klawisz G)");
+		line(s, "/femboy acc", "dodatki: kocie uszy, ogony, obroże, dzwoneczki… (" + (cfg().acc ? "włączone" : "wyłączone") + ")");
+		line(s, "/femboy sound", "odgłosy pod klawiszami: miau, hau… + głośność / wyciszanie graczy");
+		line(s, "/femboy emote <" + String.join("|", Emote.ids()) + ">", "emotka nad głową (klawisze w oknie moda)");
+		line(s, "/femboy clicker on|off | click", "clicker: kto ma włączony, obraca się do klikającego");
+		line(s, "/femboy leash <gracz> | off, leashpull on|off", "smycz / czy dajesz się ciągnąć");
+		line(s, "/femboy bells | purr | hearts | react on|off", "dzwoneczki, mruczenie, serduszka, reakcje uszu i ogona");
+		line(s, "/femboy pose <" + String.join("|", Pose.ids()) + "|stop>", "animacje ciała (klawisze w oknie moda)");
+		line(s, "/femboy boop | hands | carry | piggy <gracz>", "boop w nosek, za ręce, noszenie (za zgodą drugiej osoby)");
+		line(s, "/femboy yarn, laserfollow | toys | pawprints | blink | autopose on|off", "kłębek, laser, ślady łapek, mruganie, bochenek");
+		line(s, "/femboy trust clicker|leash|laser|carry <gracz> on|off", "na kogo reagujesz (+ clickerpicked / leashpicked / laserpicked)");
+		line(s, "/femboy wardrobe [save|wear|remove <nazwa> | next]", "szafa ze strojami");
+		line(s, "/femboy gui", "okno moda: wygląd, odgłosy, zabawa i wszystkie klawisze (klawisz G)");
 		line(s, "/femboy list | status", "kto co ma / ustawienia");
 		line(s, "/femboy export [gracz]", "zapisz skin do PNG");
 		line(s, "/femboy folder | reload", "dodatkowe własne skiny PNG");
@@ -129,6 +286,15 @@ public final class FemboyCommands {
 			.append(Text.literal(" | warstwy: ").formatted(Formatting.GRAY)).append(onOff(f.layers)));
 		msg(c, Text.literal("Głaskanie: ").append(onOff(f.pat))
 			.append(Text.literal(" (klawisz " + PatPat.keyName() + ") | piszczenie: ").formatted(Formatting.GRAY)).append(onOff(f.patSound)));
+		msg(c, Text.literal("Odgłosy: ").append(onOff(f.voice))
+			.append(Text.literal(" | głośność: ").formatted(Formatting.GRAY)).append(hl(f.voiceVolume + "%")));
+		msg(c, Text.literal("Wymiana z innymi graczami z modem: ")
+			.append(pl.vsake.femboy.net.Relay.connected() > 0
+				? Text.literal("połączono (" + pl.vsake.femboy.net.Relay.connected() + "/" + pl.vsake.femboy.net.Relay.brokers() + ")").formatted(Formatting.GREEN)
+				: Text.literal("łączenie…").formatted(Formatting.YELLOW))
+			.append(Text.literal(" | serwer: ").formatted(Formatting.GRAY))
+			.append(pl.vsake.femboy.net.NetClient.available() ? Text.literal("ma moda").formatted(Formatting.GREEN)
+				: Text.literal("bez moda").formatted(Formatting.GRAY)));
 		msg(c, Text.literal("Dodatki: ").append(onOff(f.acc))
 			.append(Text.literal(" | tryb: ").formatted(Formatting.GRAY)).append(hl(AccCommands.modeName(f.accMode)))
 			.append(Text.literal(" | ja: ").formatted(Formatting.GRAY))

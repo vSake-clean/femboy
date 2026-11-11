@@ -20,6 +20,12 @@ public final class Parts {
 
 	public static final int TEX_W = 128, TEX_H = 128;
 
+	/** Identyfikator przy obroży: nazwa elementu i rozmiar blaszki w półpikselach (napis rysuje AccessoryFeature). */
+	public static final String ID_TAG = "idtag";
+	public static final int ID_W = 10, ID_H = 5;
+	/** Wędka z zabawką sterczy z dłoni do przodu i lekko w górę; sznurek odkręca ten kąt, żeby wisieć pionowo. */
+	public static final float ROD_PITCH = -0.55f;
+
 	/** Do której części gracza przyczepiony jest element. */
 	public enum Anchor {
 		HEAD("head"), BODY("body"), RIGHT_ARM("right_arm"), LEFT_ARM("left_arm"), RIGHT_LEG("right_leg"), LEFT_LEG("left_leg");
@@ -35,7 +41,7 @@ public final class Parts {
 	public enum Fit {ANY, WIDE, SLIM}
 
 	/** Rodzaj animacji (Anim). */
-	public enum Motion {NONE, EAR, EAR_PUPPY, EAR_BUNNY, EAR_BUNNY_TOP, TAIL_CAT, TAIL_BUSHY, TAIL_PUPPY, TAIL_BUNNY, PENDANT, HAIR, SKIRT_FRONT, SKIRT_BACK, SKIRT_SIDE, WING}
+	public enum Motion {NONE, EAR, EAR_PUPPY, EAR_BUNNY, EAR_BUNNY_TOP, TAIL_CAT, TAIL_BUSHY, TAIL_PUPPY, TAIL_BUNNY, PENDANT, HAIR, SKIRT_FRONT, SKIRT_BACK, SKIRT_SIDE, WING, BELL, SCARF, DANGLE, DANGLE_END}
 
 	public static final class Box {
 		public final String tag;
@@ -81,6 +87,8 @@ public final class Parts {
 		/** Numer segmentu w ogonie. */
 		public final int index;
 		public final Motion motion;
+		/** Pomniejszenie całego elementu (0,5 = kostki w półpikselach – drobne detale jak dzwoneczki czy identyfikator). */
+		public float scale = 1f;
 		public final List<Box> boxes = new ArrayList<>();
 
 		Piece(String name, EnumSet<Item> items, Fit fit, Anchor anchor, Piece parent, float ox, float oy, float oz,
@@ -103,6 +111,11 @@ public final class Parts {
 
 		Piece box(String tag, float x, float y, float z, int sx, int sy, int sz) {
 			return box(tag, x, y, z, sx, sy, sz, 0f, 0f, 0f);
+		}
+
+		Piece scale(float s) {
+			scale = s;
+			return this;
 		}
 
 		Piece box(String tag, float x, float y, float z, int sx, int sy, int sz, float g) {
@@ -153,16 +166,38 @@ public final class Parts {
 		return p;
 	}
 
+	/** Jak child(), ale widoczny tylko przy podanych dodatkach (np. dzwoneczek przy uchu). */
+	private static Piece child(List<Piece> l, String name, Piece parent, EnumSet<Item> items, float ox, float oy, float oz, Motion m) {
+		Piece p = new Piece(name, items, parent.fit, null, parent, ox, oy, oz, 0, 0, 0, parent.side, 0, m);
+		l.add(p);
+		return p;
+	}
+
+	/** Mały okrągły dzwoneczek w półpikselach (element musi mieć scale 0,5): uszko, kopułka, brzuszek, szczelina. */
+	private static Piece jingle(Piece p) {
+		return p.scale(0.5f)
+			.box("loop", -0.5f, -1, -0.5f, 1, 1, 1)
+			.box("dome", -1, 0, -1, 2, 1, 2)
+			.box("body", -1.5f, 1, -1.5f, 3, 2, 3)
+			.box("lip", -1, 3, -1, 2, 1, 2);
+	}
+
 	private static void build(List<Piece> l) {
 		// ======================== uszy (na głowie, przy górnej krawędzi; podstawa lekko w włosach) ========================
 		for (int s : new int[]{-1, 1}) {
 			String sd = s < 0 ? "r" : "l";
 			// kocie: trójkąt 4x5, odchylone na boki i lekko "otwarte" do przodu
-			root(l, "ear_cat_" + sd, EnumSet.of(EARS_CAT), Fit.ANY, Anchor.HEAD, s * 2.5f, -7.9f, -0.5f, -0.05f, -s * 0.3f, s * 0.25f, s, Motion.EAR)
+			Piece cat = root(l, "ear_cat_" + sd, EnumSet.of(EARS_CAT, EARS_CAT_BELL), Fit.ANY, Anchor.HEAD, s * 2.5f, -7.9f, -0.5f, -0.05f, -s * 0.3f, s * 0.25f, s, Motion.EAR)
 				.box("r0", -2, -2, -0.5f, 4, 2, 1)
 				.box("r1", -1.5f, -3, -0.5f, 3, 1, 1)
 				.box("r2", -1, -4, -0.5f, 2, 1, 1)
 				.box("r3", -0.5f, -5, -0.5f, 1, 1, 1);
+			// z dzwoneczkami: wstążka u nasady ucha i dzwoneczek pod nią (rusza się razem z uchem)
+			child(l, "earribbon_" + sd, cat, EnumSet.of(EARS_CAT_BELL), s * 1.2f, -1.2f, -0.75f, Motion.NONE).scale(0.5f)
+				.box("loop_r", -2.5f, -1, -0.5f, 2, 2, 1)
+				.box("loop_l", 0.5f, -1, -0.5f, 2, 2, 1)
+				.box("knot", -0.5f, -0.5f, -0.9f, 1, 1, 1);
+			jingle(child(l, "jingle_ear_" + sd, cat, EnumSet.of(EARS_CAT_BELL), s * 1.2f, -0.9f, -1.0f, Motion.BELL));
 			// lisie: duże trójkąty z szeroką podstawą, jasnym środkiem i ciemnym czubkiem
 			root(l, "ear_fox_" + sd, EnumSet.of(EARS_FOX), Fit.ANY, Anchor.HEAD, s * 2.8f, -7.9f, -0.3f, -0.08f, -s * 0.22f, s * 0.3f, s, Motion.EAR)
 				.box("r0", -2.5f, -2, -0.5f, 5, 2, 1)
@@ -226,7 +261,7 @@ public final class Parts {
 			.box("end", -1, -1, 2, 2, 2, 1);
 
 		// ======================== szyja: obroża/choker na górze tułowia + zawieszka z przodu ========================
-		root(l, "collar", EnumSet.of(NECK_BELL, NECK_TAG, NECK_HEART, NECK_BOW, NECK_LOCK, NECK_SPIKES), Fit.ANY, Anchor.BODY, 0, 0, 0, 0, 0, 0, 0, Motion.NONE)
+		root(l, "collar", EnumSet.of(NECK_BELL, NECK_TAG, NECK_HEART, NECK_BOW, NECK_LOCK, NECK_SPIKES, NECK_ID, NECK_BELLS), Fit.ANY, Anchor.BODY, 0, 0, 0, 0, 0, 0, 0, Motion.NONE)
 			.box("band", -4, 0.5f, -2, 8, 1, 4, 0.45f, 0.12f, 0.45f);
 		root(l, "bell", EnumSet.of(NECK_BELL), Fit.ANY, Anchor.BODY, 0, 1.5f, -2.45f, 0, 0, 0, 0, Motion.PENDANT)
 			.box("bell", -1, -0.1f, -2, 2, 2, 2);
@@ -243,8 +278,34 @@ public final class Parts {
 		Piece spikes = root(l, "spikes", EnumSet.of(NECK_SPIKES), Fit.ANY, Anchor.BODY, 0, 0.5f, -2.5f, 0, 0, 0, 0, Motion.NONE);
 		for (int i = 0; i < 4; i++) spikes.box("sp" + i, -3.5f + i * 2, 0, -0.6f, 1, 1, 1);
 
+		// trzy małe dzwoneczki obok siebie
+		for (int i = -1; i <= 1; i++)
+			jingle(root(l, "jingle_c" + (i + 1), EnumSet.of(NECK_BELLS), Fit.ANY, Anchor.BODY, i * 2.1f, 1.6f, -2.75f, 0, 0, 0, i, Motion.PENDANT));
+		// identyfikator: kółeczko i blaszka 5×2,5 px – na niej nick (rysuje AccessoryFeature, czytelny z bliska)
+		root(l, ID_TAG, EnumSet.of(NECK_ID), Fit.ANY, Anchor.BODY, 0, 1.5f, -2.45f, 0, 0, 0, 0, Motion.PENDANT).scale(0.5f)
+			.box("ring", -1, -0.6f, -1.5f, 2, 2, 1)
+			.box("plate", -ID_W / 2f, 1.4f, -1.5f, ID_W, ID_H, 1)
+			.box("rivet_r", -ID_W / 2f + 0.5f, 1.9f, -1.8f, 1, 1, 1)
+			.box("rivet_l", ID_W / 2f - 1.5f, 1.9f, -1.8f, 1, 1, 1);
+		// szalik: gruby zawój na szyi, węzeł z boku, jeden koniec z przodu, drugi przerzucony na plecy – powiewają
+		root(l, "scarf", EnumSet.of(NECK_SCARF), Fit.ANY, Anchor.BODY, 0, 0, 0, 0, 0, 0, 0, Motion.NONE)
+			.box("wrap", -4, 0, -2, 8, 2, 4, 0.75f, 0.3f, 0.75f)
+			.box("knot", 1.3f, 0.2f, -3.6f, 2, 2, 1, 0.2f);
+		Piece sc = root(l, "scarf_tail_0", EnumSet.of(NECK_SCARF), Fit.ANY, Anchor.BODY, 2.3f, 2.0f, -3.1f, 0, 0, -0.06f, 1, Motion.SCARF)
+			.box("a", -1, 0, -0.5f, 2, 4, 1);
+		child(l, "scarf_tail_1", sc, 0, 4, 0, 0, 0, 0, 1, Motion.SCARF)
+			.box("b", -1, 0, -0.5f, 2, 3, 1)
+			.box("fringe", -1, 3, -0.5f, 2, 1, 1);
+		sc = root(l, "scarf_back_0", EnumSet.of(NECK_SCARF), Fit.ANY, Anchor.BODY, -2.3f, 1.6f, 3.0f, 0.08f, 0, 0.05f, -1, Motion.SCARF)
+			.box("a", -1, 0, -0.5f, 2, 4, 1);
+		child(l, "scarf_back_1", sc, 0, 4, 0, 0, 0, 0, 1, Motion.SCARF)
+			.box("b", -1, 0, -0.5f, 2, 3, 1)
+			.box("fringe", -1, 3, -0.5f, 2, 1, 1);
+
 		// ======================== włosy: kokardka na czubku głowy / spinka nad prawym okiem ========================
-		bow(root(l, "hairbow", EnumSet.of(HEAD_BOW), Fit.ANY, Anchor.HEAD, 2.6f, -9.0f, -2.4f, -0.15f, -0.2f, 0.3f, 1, Motion.HAIR), -0.5f);
+		Piece hb = root(l, "hairbow", EnumSet.of(HEAD_BOW, HEAD_BOW_BELL), Fit.ANY, Anchor.HEAD, 2.6f, -9.0f, -2.4f, -0.15f, -0.2f, 0.3f, 1, Motion.HAIR);
+		bow(hb, -0.5f);
+		jingle(child(l, "jingle_bow", hb, EnumSet.of(HEAD_BOW_BELL), 0, 0.9f, -0.9f, Motion.BELL));
 		heart(root(l, "clip", EnumSet.of(HEAD_CLIP), Fit.ANY, Anchor.HEAD, -2.6f, -7.6f, -4.55f, 0, 0, -0.2f, -1, Motion.HAIR), -1f);
 		// aureolka: złote kółko unoszące się nad głową
 		root(l, "halo", EnumSet.of(HEAD_HALO), Fit.ANY, Anchor.HEAD, 0, -11.5f, 0, 0, 0, 0, 0, Motion.HAIR)
@@ -298,14 +359,6 @@ public final class Parts {
 				new int[][]{{5, -3, 2}, {6, -1, 2}, {4, 1, 1}, {4, 2, 2}, {3, 4, 1}});
 		}
 
-		// ======================== nogi: zakolanówki (nad warstwą spodni) z gumką u góry ========================
-		for (int s : new int[]{-1, 1}) {
-			root(l, s < 0 ? "sock_r" : "sock_l", EnumSet.of(LEGS_SOCKS, LEGS_STRIPES), Fit.ANY, s < 0 ? Anchor.RIGHT_LEG : Anchor.LEFT_LEG,
-				0, 0, 0, 0, 0, 0, s, Motion.NONE)
-				.box("sock", -2, 2, -2, 4, 10, 4, 0.35f)
-				.box("cuff", -2, 2, -2, 4, 1, 4, 0.5f, 0.15f, 0.5f);
-		}
-
 		// ======================== ręce: ocieplacze na przedramionach (pod łapkami) ========================
 		for (int s : new int[]{-1, 1}) {
 			Anchor a = s < 0 ? Anchor.RIGHT_ARM : Anchor.LEFT_ARM;
@@ -332,6 +385,24 @@ public final class Parts {
 				.box("glove", sx, 6, -2, 3, 4, 4, 0.35f)
 				.box("cuff", sx, 6, -2, 3, 1, 4, 0.55f, 0.2f, 0.55f);
 		}
+
+		// ======================== w ręce: wędka (półpiksele), sznurek zawsze w pionie, na końcu myszka albo piórko ========================
+		EnumSet<Item> toys = EnumSet.of(TOY_MOUSE, TOY_FEATHER);
+		Piece rod = root(l, "toyrod", toys, Fit.ANY, Anchor.RIGHT_ARM, -1, 9.5f, -1.5f, ROD_PITCH, 0, 0, -1, Motion.NONE).scale(0.5f)
+			.box("grip", -1, -1, -3, 2, 2, 5)
+			.box("rod", -0.5f, -0.5f, -21, 1, 1, 18);
+		Piece string = child(l, "toystring", rod, 0, 0, -20.5f, -ROD_PITCH, 0, 0, 1, Motion.DANGLE)
+			.box("line", -0.5f, 0, -0.5f, 1, 11, 1);
+		child(l, "toymouse", string, EnumSet.of(TOY_MOUSE), 0, 11, 0, Motion.DANGLE_END)
+			.box("body", -2, 0, -3, 4, 3, 6)
+			.box("ear_r", -2.5f, -1, -1.5f, 2, 2, 1)
+			.box("ear_l", 0.5f, -1, -1.5f, 2, 2, 1)
+			.box("tail", -0.5f, 1.5f, 3, 1, 1, 5);
+		child(l, "toyfeather", string, EnumSet.of(TOY_FEATHER), 0, 11, 0, Motion.DANGLE_END)
+			.box("quill", -0.5f, 0, -0.5f, 1, 9, 1)
+			.box("vane_a", -2.5f, 1, -0.5f, 5, 3, 1)
+			.box("vane_b", -2, 4, -0.5f, 4, 3, 1)
+			.box("vane_c", -1.5f, 7, -0.5f, 3, 2, 1);
 
 		// ======================== plisowana spódniczka: pasek + 4 rozkloszowane panele ========================
 		EnumSet<Item> sk = EnumSet.of(SKIRT);

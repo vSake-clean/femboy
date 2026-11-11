@@ -26,7 +26,7 @@ public final class AccessoryModel extends PlayerEntityModel {
 	/** Część modelu dla każdego elementu z Parts.PIECES (ten sam indeks). */
 	private final ModelPart[] parts;
 	private final Anim.In in = new Anim.In();
-	private final float[] delta = new float[6];
+	private final float[] delta = new float[Anim.OUT];
 
 	private AccessoryModel(ModelPart root, boolean slim) {
 		super(root, slim);
@@ -53,7 +53,7 @@ public final class AccessoryModel extends PlayerEntityModel {
 			ModelPartBuilder b = ModelPartBuilder.create();
 			for (Parts.Box box : p.boxes)
 				b.uv(box.u, box.v).cuboid(box.x, box.y, box.z, box.sx, box.sy, box.sz, new Dilation(box.gx, box.gy, box.gz));
-			made.put(p.name, parent.addChild(p.name, b, ModelTransform.of(p.ox, p.oy, p.oz, p.pitch, p.yaw, p.roll)));
+			made.put(p.name, parent.addChild(p.name, b, ModelTransform.of(p.ox, p.oy, p.oz, p.pitch, p.yaw, p.roll).withScale(p.scale)));
 		}
 		return new AccessoryModel(TexturedModelData.of(data, Parts.TEX_W, Parts.TEX_H).createModel(), slim);
 	}
@@ -85,6 +85,16 @@ public final class AccessoryModel extends PlayerEntityModel {
 			in.pat = ((PatRenderState) state).femboy$getPatTime();
 			in.rightLegPitch = rightLeg.pitch;
 			in.leftLegPitch = leftLeg.pitch;
+			pl.vsake.femboy.fx.Reactions.State r = ((AccessoryRenderState) state).femboy$react();
+			in.riding |= pl.vsake.femboy.fx.Poses.grounded(r); // siad / leżenie: ogon kładzie się jak na krześle
+			in.sneaking &= r.pose == null || r.poseW < 0.5f;
+			in.hunt = r.hunt;
+			in.rightArmPitch = rightArm.pitch;
+			in.rightArmRoll = rightArm.roll;
+			in.flat = r.flat;
+			in.perk = r.perk;
+			in.wag = r.wag;
+			in.puff = r.puff;
 		}
 		List<Parts.Piece> pieces = Parts.PIECES;
 		for (int i = 0; i < parts.length; i++) {
@@ -99,6 +109,21 @@ public final class AccessoryModel extends PlayerEntityModel {
 			part.originX += delta[3];
 			part.originY += delta[4];
 			part.originZ += delta[5];
+			if (delta[6] != 0f) { // nastroszony ogon: grubszy, nie dłuższy (dzieci dziedziczą skalę)
+				part.xScale *= 1f + delta[6];
+				part.yScale *= 1f + delta[6];
+			}
 		}
+	}
+
+	/** Część modelu o nazwie z Parts (po setAngles ma aktualną pozę) albo null. */
+	public ModelPart part(String name) {
+		List<Parts.Piece> pieces = Parts.PIECES;
+		for (int i = 0; i < parts.length; i++) if (pieces.get(i).name.equals(name)) return parts[i];
+		return null;
+	}
+
+	public ModelPart bodyPart() {
+		return body;
 	}
 }

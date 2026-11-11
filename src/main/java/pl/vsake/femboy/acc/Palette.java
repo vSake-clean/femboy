@@ -42,7 +42,7 @@ public final class Palette {
 		add("golden", "złoty", 0xD8A848);
 	}
 
-	/** Kolory dodatków (obroże, kokardki, zakolanówki) – losowanie częściej trafia w róże i czerń. */
+	/** Kolory dodatków (obroże, kokardki, szaliki) – losowanie częściej trafia w róże i czerń. */
 	public static final int[] ACCENTS = {
 		rgb("pink"), rgb("pink"), rgb("hotpink"), rgb("black"), rgb("black"), rgb("white"),
 		rgb("lightblue"), rgb("lavender"), rgb("purple"), rgb("red"), rgb("mint"), rgb("blue"),
@@ -82,7 +82,7 @@ public final class Palette {
 	/** Naturalne futra dla danych uszu/ogona (gdy "auto" nie ma skąd wziąć koloru włosów albo los tak chce). */
 	public static int[] furs(Item ears, Item tail) {
 		Item k = ears != null ? ears : tail;
-		String which = k == null ? "cat" : k.id;
+		String which = k == null || k.catEars() ? "cat" : k.id;
 		return switch (which) {
 			case "fox" -> new int[]{rgb("ginger"), rgb("ginger"), rgb("orange"), rgb("white"), rgb("silver"), rgb("brown")};
 			case "wolf" -> new int[]{rgb("gray"), rgb("gray"), rgb("black"), rgb("white"), rgb("silver"), rgb("brown")};

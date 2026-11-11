@@ -5,6 +5,7 @@
 	"client": [
 		"AbstractClientPlayerEntityMixin",
 		"BipedEntityModelMixin",
+		"EntityRenderManagerMixin",
 		"LivingEntityRendererMixin",
 		"LivingEntityRenderStateMixin",
 		"PlayerEntityRendererMixin",

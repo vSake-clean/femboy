@@ -12,6 +12,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import pl.vsake.femboy.fx.EmoteRender;
 import pl.vsake.femboy.pat.PatPat;
 import pl.vsake.femboy.pat.PatRender;
 import pl.vsake.femboy.pat.PatRenderState;
@@ -40,6 +41,7 @@ public abstract class LivingEntityRendererMixin {
 	private void femboy$patHand(LivingEntityRenderState state, MatrixStack matrices, OrderedRenderCommandQueue queue,
 								CameraRenderState camera, CallbackInfo ci) {
 		PatRender.hand(state, matrices, queue, camera, femboy$biped());
+		EmoteRender.draw(state, matrices, queue, camera);
 	}
 
 	@Unique

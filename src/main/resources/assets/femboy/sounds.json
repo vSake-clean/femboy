@@ -7,5 +7,923 @@
 			"femboy:petpet/squeak3",
 			"femboy:petpet/squeak4"
 		]
+	},
+	"voice.meow.0": {
+		"subtitle": "subtitles.femboy.voice.meow",
+		"sounds": [
+			{
+				"name": "minecraft:mob/cat/meow1",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.meow.1": {
+		"subtitle": "subtitles.femboy.voice.meow",
+		"sounds": [
+			{
+				"name": "minecraft:mob/cat/meow2",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.meow.2": {
+		"subtitle": "subtitles.femboy.voice.meow",
+		"sounds": [
+			{
+				"name": "minecraft:mob/cat/meow3",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.meow.3": {
+		"subtitle": "subtitles.femboy.voice.meow",
+		"sounds": [
+			{
+				"name": "minecraft:mob/cat/meow4",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.meow.4": {
+		"subtitle": "subtitles.femboy.voice.meow",
+		"sounds": [
+			{
+				"name": "minecraft:mob/cat/stray/idle1",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.meow.5": {
+		"subtitle": "subtitles.femboy.voice.meow",
+		"sounds": [
+			{
+				"name": "minecraft:mob/cat/stray/idle2",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.meow.6": {
+		"subtitle": "subtitles.femboy.voice.meow",
+		"sounds": [
+			{
+				"name": "minecraft:mob/cat/stray/idle3",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.meow.7": {
+		"subtitle": "subtitles.femboy.voice.meow",
+		"sounds": [
+			{
+				"name": "minecraft:mob/cat/stray/idle4",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.meow.8": {
+		"subtitle": "subtitles.femboy.voice.meow",
+		"sounds": [
+			{
+				"name": "minecraft:mob/cat/ocelot/idle1",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.meow.9": {
+		"subtitle": "subtitles.femboy.voice.meow",
+		"sounds": [
+			{
+				"name": "minecraft:mob/cat/ocelot/idle2",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.meow.10": {
+		"subtitle": "subtitles.femboy.voice.meow",
+		"sounds": [
+			{
+				"name": "minecraft:mob/cat/ocelot/idle3",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.meow.11": {
+		"subtitle": "subtitles.femboy.voice.meow",
+		"sounds": [
+			{
+				"name": "minecraft:mob/cat/ocelot/idle4",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.meow.12": {
+		"subtitle": "subtitles.femboy.voice.meow",
+		"sounds": [
+			{
+				"name": "minecraft:mob/cat/beg1",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.meow.13": {
+		"subtitle": "subtitles.femboy.voice.meow",
+		"sounds": [
+			{
+				"name": "minecraft:mob/cat/beg2",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.meow.14": {
+		"subtitle": "subtitles.femboy.voice.meow",
+		"sounds": [
+			{
+				"name": "minecraft:mob/cat/beg3",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.meow.15": {
+		"subtitle": "subtitles.femboy.voice.meow",
+		"sounds": [
+			{
+				"name": "minecraft:mob/cat/purreow1",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.meow.16": {
+		"subtitle": "subtitles.femboy.voice.meow",
+		"sounds": [
+			{
+				"name": "minecraft:mob/cat/purreow2",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.bark.0": {
+		"subtitle": "subtitles.femboy.voice.bark",
+		"sounds": [
+			{
+				"name": "minecraft:mob/wolf/classic/bark1",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.bark.1": {
+		"subtitle": "subtitles.femboy.voice.bark",
+		"sounds": [
+			{
+				"name": "minecraft:mob/wolf/classic/bark2",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.bark.2": {
+		"subtitle": "subtitles.femboy.voice.bark",
+		"sounds": [
+			{
+				"name": "minecraft:mob/wolf/classic/bark3",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.bark.3": {
+		"subtitle": "subtitles.femboy.voice.bark",
+		"sounds": [
+			{
+				"name": "minecraft:mob/wolf/angry/bark1",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.bark.4": {
+		"subtitle": "subtitles.femboy.voice.bark",
+		"sounds": [
+			{
+				"name": "minecraft:mob/wolf/angry/bark2",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.bark.5": {
+		"subtitle": "subtitles.femboy.voice.bark",
+		"sounds": [
+			{
+				"name": "minecraft:mob/wolf/angry/bark3",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.bark.6": {
+		"subtitle": "subtitles.femboy.voice.bark",
+		"sounds": [
+			{
+				"name": "minecraft:mob/wolf/big/bark1",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.bark.7": {
+		"subtitle": "subtitles.femboy.voice.bark",
+		"sounds": [
+			{
+				"name": "minecraft:mob/wolf/big/bark2",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.bark.8": {
+		"subtitle": "subtitles.femboy.voice.bark",
+		"sounds": [
+			{
+				"name": "minecraft:mob/wolf/big/bark3",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.bark.9": {
+		"subtitle": "subtitles.femboy.voice.bark",
+		"sounds": [
+			{
+				"name": "minecraft:mob/wolf/cute/bark1",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.bark.10": {
+		"subtitle": "subtitles.femboy.voice.bark",
+		"sounds": [
+			{
+				"name": "minecraft:mob/wolf/cute/bark2",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.bark.11": {
+		"subtitle": "subtitles.femboy.voice.bark",
+		"sounds": [
+			{
+				"name": "minecraft:mob/wolf/cute/bark3",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.bark.12": {
+		"subtitle": "subtitles.femboy.voice.bark",
+		"sounds": [
+			{
+				"name": "minecraft:mob/wolf/grumpy/bark1",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.bark.13": {
+		"subtitle": "subtitles.femboy.voice.bark",
+		"sounds": [
+			{
+				"name": "minecraft:mob/wolf/grumpy/bark2",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.bark.14": {
+		"subtitle": "subtitles.femboy.voice.bark",
+		"sounds": [
+			{
+				"name": "minecraft:mob/wolf/grumpy/bark3",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.bark.15": {
+		"subtitle": "subtitles.femboy.voice.bark",
+		"sounds": [
+			{
+				"name": "minecraft:mob/wolf/puglin/bark1",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.bark.16": {
+		"subtitle": "subtitles.femboy.voice.bark",
+		"sounds": [
+			{
+				"name": "minecraft:mob/wolf/puglin/bark2",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.bark.17": {
+		"subtitle": "subtitles.femboy.voice.bark",
+		"sounds": [
+			{
+				"name": "minecraft:mob/wolf/puglin/bark3",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.bark.18": {
+		"subtitle": "subtitles.femboy.voice.bark",
+		"sounds": [
+			{
+				"name": "minecraft:mob/wolf/sad/bark1",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.bark.19": {
+		"subtitle": "subtitles.femboy.voice.bark",
+		"sounds": [
+			{
+				"name": "minecraft:mob/wolf/sad/bark2",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.bark.20": {
+		"subtitle": "subtitles.femboy.voice.bark",
+		"sounds": [
+			{
+				"name": "minecraft:mob/wolf/sad/bark3",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.purr.0": {
+		"subtitle": "subtitles.femboy.voice.purr",
+		"sounds": [
+			{
+				"name": "minecraft:mob/cat/purr1",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.purr.1": {
+		"subtitle": "subtitles.femboy.voice.purr",
+		"sounds": [
+			{
+				"name": "minecraft:mob/cat/purr2",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.purr.2": {
+		"subtitle": "subtitles.femboy.voice.purr",
+		"sounds": [
+			{
+				"name": "minecraft:mob/cat/purr3",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.hiss.0": {
+		"subtitle": "subtitles.femboy.voice.hiss",
+		"sounds": [
+			{
+				"name": "minecraft:mob/cat/hiss1",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.hiss.1": {
+		"subtitle": "subtitles.femboy.voice.hiss",
+		"sounds": [
+			{
+				"name": "minecraft:mob/cat/hiss2",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.hiss.2": {
+		"subtitle": "subtitles.femboy.voice.hiss",
+		"sounds": [
+			{
+				"name": "minecraft:mob/cat/hiss3",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.growl.0": {
+		"subtitle": "subtitles.femboy.voice.growl",
+		"sounds": [
+			{
+				"name": "minecraft:mob/wolf/classic/growl1",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.growl.1": {
+		"subtitle": "subtitles.femboy.voice.growl",
+		"sounds": [
+			{
+				"name": "minecraft:mob/wolf/classic/growl2",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.growl.2": {
+		"subtitle": "subtitles.femboy.voice.growl",
+		"sounds": [
+			{
+				"name": "minecraft:mob/wolf/classic/growl3",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.growl.3": {
+		"subtitle": "subtitles.femboy.voice.growl",
+		"sounds": [
+			{
+				"name": "minecraft:mob/wolf/angry/growl1",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.growl.4": {
+		"subtitle": "subtitles.femboy.voice.growl",
+		"sounds": [
+			{
+				"name": "minecraft:mob/wolf/angry/growl2",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.growl.5": {
+		"subtitle": "subtitles.femboy.voice.growl",
+		"sounds": [
+			{
+				"name": "minecraft:mob/wolf/angry/growl3",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.growl.6": {
+		"subtitle": "subtitles.femboy.voice.growl",
+		"sounds": [
+			{
+				"name": "minecraft:mob/wolf/big/growl1",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.growl.7": {
+		"subtitle": "subtitles.femboy.voice.growl",
+		"sounds": [
+			{
+				"name": "minecraft:mob/wolf/big/growl2",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.growl.8": {
+		"subtitle": "subtitles.femboy.voice.growl",
+		"sounds": [
+			{
+				"name": "minecraft:mob/wolf/big/growl3",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.growl.9": {
+		"subtitle": "subtitles.femboy.voice.growl",
+		"sounds": [
+			{
+				"name": "minecraft:mob/wolf/cute/growl1",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.growl.10": {
+		"subtitle": "subtitles.femboy.voice.growl",
+		"sounds": [
+			{
+				"name": "minecraft:mob/wolf/cute/growl2",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.growl.11": {
+		"subtitle": "subtitles.femboy.voice.growl",
+		"sounds": [
+			{
+				"name": "minecraft:mob/wolf/cute/growl3",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.growl.12": {
+		"subtitle": "subtitles.femboy.voice.growl",
+		"sounds": [
+			{
+				"name": "minecraft:mob/wolf/grumpy/growl1",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.growl.13": {
+		"subtitle": "subtitles.femboy.voice.growl",
+		"sounds": [
+			{
+				"name": "minecraft:mob/wolf/grumpy/growl2",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.growl.14": {
+		"subtitle": "subtitles.femboy.voice.growl",
+		"sounds": [
+			{
+				"name": "minecraft:mob/wolf/grumpy/growl3",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.growl.15": {
+		"subtitle": "subtitles.femboy.voice.growl",
+		"sounds": [
+			{
+				"name": "minecraft:mob/wolf/puglin/growl1",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.growl.16": {
+		"subtitle": "subtitles.femboy.voice.growl",
+		"sounds": [
+			{
+				"name": "minecraft:mob/wolf/puglin/growl2",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.growl.17": {
+		"subtitle": "subtitles.femboy.voice.growl",
+		"sounds": [
+			{
+				"name": "minecraft:mob/wolf/puglin/growl3",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.growl.18": {
+		"subtitle": "subtitles.femboy.voice.growl",
+		"sounds": [
+			{
+				"name": "minecraft:mob/wolf/sad/growl1",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.growl.19": {
+		"subtitle": "subtitles.femboy.voice.growl",
+		"sounds": [
+			{
+				"name": "minecraft:mob/wolf/sad/growl2",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.growl.20": {
+		"subtitle": "subtitles.femboy.voice.growl",
+		"sounds": [
+			{
+				"name": "minecraft:mob/wolf/sad/growl3",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.whine.0": {
+		"subtitle": "subtitles.femboy.voice.whine",
+		"sounds": [
+			{
+				"name": "minecraft:mob/wolf/classic/whine",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.whine.1": {
+		"subtitle": "subtitles.femboy.voice.whine",
+		"sounds": [
+			{
+				"name": "minecraft:mob/wolf/angry/whine",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.whine.2": {
+		"subtitle": "subtitles.femboy.voice.whine",
+		"sounds": [
+			{
+				"name": "minecraft:mob/wolf/big/whine",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.whine.3": {
+		"subtitle": "subtitles.femboy.voice.whine",
+		"sounds": [
+			{
+				"name": "minecraft:mob/wolf/cute/whine",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.whine.4": {
+		"subtitle": "subtitles.femboy.voice.whine",
+		"sounds": [
+			{
+				"name": "minecraft:mob/wolf/grumpy/whine",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.whine.5": {
+		"subtitle": "subtitles.femboy.voice.whine",
+		"sounds": [
+			{
+				"name": "minecraft:mob/wolf/puglin/whine",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.whine.6": {
+		"subtitle": "subtitles.femboy.voice.whine",
+		"sounds": [
+			{
+				"name": "minecraft:mob/wolf/sad/whine",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.pant.0": {
+		"subtitle": "subtitles.femboy.voice.pant",
+		"sounds": [
+			{
+				"name": "minecraft:mob/wolf/classic/panting",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.pant.1": {
+		"subtitle": "subtitles.femboy.voice.pant",
+		"sounds": [
+			{
+				"name": "minecraft:mob/wolf/angry/panting",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.pant.2": {
+		"subtitle": "subtitles.femboy.voice.pant",
+		"sounds": [
+			{
+				"name": "minecraft:mob/wolf/big/panting",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.pant.3": {
+		"subtitle": "subtitles.femboy.voice.pant",
+		"sounds": [
+			{
+				"name": "minecraft:mob/wolf/cute/panting",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.pant.4": {
+		"subtitle": "subtitles.femboy.voice.pant",
+		"sounds": [
+			{
+				"name": "minecraft:mob/wolf/grumpy/panting",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.pant.5": {
+		"subtitle": "subtitles.femboy.voice.pant",
+		"sounds": [
+			{
+				"name": "minecraft:mob/wolf/puglin/panting",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.pant.6": {
+		"subtitle": "subtitles.femboy.voice.pant",
+		"sounds": [
+			{
+				"name": "minecraft:mob/wolf/sad/panting",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.fox.0": {
+		"subtitle": "subtitles.femboy.voice.fox",
+		"sounds": [
+			{
+				"name": "minecraft:mob/fox/idle1",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.fox.1": {
+		"subtitle": "subtitles.femboy.voice.fox",
+		"sounds": [
+			{
+				"name": "minecraft:mob/fox/idle2",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.fox.2": {
+		"subtitle": "subtitles.femboy.voice.fox",
+		"sounds": [
+			{
+				"name": "minecraft:mob/fox/idle3",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.fox.3": {
+		"subtitle": "subtitles.femboy.voice.fox",
+		"sounds": [
+			{
+				"name": "minecraft:mob/fox/idle4",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.fox.4": {
+		"subtitle": "subtitles.femboy.voice.fox",
+		"sounds": [
+			{
+				"name": "minecraft:mob/fox/idle5",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.fox.5": {
+		"subtitle": "subtitles.femboy.voice.fox",
+		"sounds": [
+			{
+				"name": "minecraft:mob/fox/idle6",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.fox.6": {
+		"subtitle": "subtitles.femboy.voice.fox",
+		"sounds": [
+			{
+				"name": "minecraft:mob/fox/screech1",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.fox.7": {
+		"subtitle": "subtitles.femboy.voice.fox",
+		"sounds": [
+			{
+				"name": "minecraft:mob/fox/screech2",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.fox.8": {
+		"subtitle": "subtitles.femboy.voice.fox",
+		"sounds": [
+			{
+				"name": "minecraft:mob/fox/screech3",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.fox.9": {
+		"subtitle": "subtitles.femboy.voice.fox",
+		"sounds": [
+			{
+				"name": "minecraft:mob/fox/screech4",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.squeak.0": {
+		"subtitle": "subtitles.femboy.voice.squeak",
+		"sounds": [
+			{
+				"name": "minecraft:mob/rabbit/idle1",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.squeak.1": {
+		"subtitle": "subtitles.femboy.voice.squeak",
+		"sounds": [
+			{
+				"name": "minecraft:mob/rabbit/idle2",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.squeak.2": {
+		"subtitle": "subtitles.femboy.voice.squeak",
+		"sounds": [
+			{
+				"name": "minecraft:mob/rabbit/idle3",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.squeak.3": {
+		"subtitle": "subtitles.femboy.voice.squeak",
+		"sounds": [
+			{
+				"name": "minecraft:mob/rabbit/idle4",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.squeak.4": {
+		"subtitle": "subtitles.femboy.voice.squeak",
+		"sounds": [
+			{
+				"name": "femboy:petpet/squeak1",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.squeak.5": {
+		"subtitle": "subtitles.femboy.voice.squeak",
+		"sounds": [
+			{
+				"name": "femboy:petpet/squeak2",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.squeak.6": {
+		"subtitle": "subtitles.femboy.voice.squeak",
+		"sounds": [
+			{
+				"name": "femboy:petpet/squeak3",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"voice.squeak.7": {
+		"subtitle": "subtitles.femboy.voice.squeak",
+		"sounds": [
+			{
+				"name": "femboy:petpet/squeak4",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"bell": {
+		"subtitle": "subtitles.femboy.bell",
+		"sounds": [
+			{
+				"name": "minecraft:note/bell",
+				"volume": 0.6,
+				"attenuation_distance": 16
+			}
+		]
+	},
+	"clicker": {
+		"subtitle": "subtitles.femboy.clicker",
+		"sounds": [
+			{
+				"name": "femboy:fx/clicker",
+				"attenuation_distance": 24
+			}
+		]
+	},
+	"boop": {
+		"subtitle": "subtitles.femboy.boop",
+		"sounds": [
+			{
+				"name": "femboy:fx/boop",
+				"attenuation_distance": 16
+			}
+		]
+	},
+	"purr_loop": {
+		"subtitle": "subtitles.femboy.voice.purr",
+		"sounds": [
+			{
+				"name": "minecraft:mob/cat/purr1",
+				"attenuation_distance": 12
+			},
+			{
+				"name": "minecraft:mob/cat/purr2",
+				"attenuation_distance": 12
+			},
+			{
+				"name": "minecraft:mob/cat/purr3",
+				"attenuation_distance": 12
+			}
+		]
 	}
 }

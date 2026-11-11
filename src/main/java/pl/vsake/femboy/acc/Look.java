@@ -11,7 +11,7 @@ public final class Look {
 	private final Item[] items;
 	/** Kolor futra (uszy, ogon, łapki) 0xRRGGBB. */
 	public final int fur;
-	/** Kolor dodatków (obroża, kokardki, zakolanówki, spódniczka) 0xRRGGBB. */
+	/** Kolor dodatków (obroża, kokardki, szalik, spódniczka) 0xRRGGBB. */
 	public final int accent;
 	/** Do animacji: żeby uszy i ogony różnych osób nie ruszały się równo. */
 	public final long seed;
@@ -34,6 +34,18 @@ public final class Look {
 
 	public boolean has(Item item) {
 		return items[item.slot.ordinal()] == item;
+	}
+
+	/** Czy coś z dzwoneczkiem – wtedy dzwoni przy chodzeniu. */
+	public boolean hasBell() {
+		for (Item it : items) if (it != null && it.bell()) return true;
+		return false;
+	}
+
+	/** Kot (kocie uszy albo ogon) – mruczy przy głaskaniu. */
+	public boolean isCat() {
+		Item e = items[Item.Slot.EARS.ordinal()];
+		return e != null && e.catEars() || has(Item.TAIL_CAT);
 	}
 
 	public boolean isEmpty() {

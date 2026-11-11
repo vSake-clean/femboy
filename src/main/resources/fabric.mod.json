@@ -3,13 +3,17 @@
 	"id": "femboy",
 	"version": "${version}",
 	"name": "Femboy Skins",
-	"description": "Zamienia skiny wszystkich graczy na femboyów, e-girls i catboyów – tylko u ciebie, po stronie klienta. Uszy, ogony, skrzydła, aureolki, różki, obroże, głaskanie i okno wyboru wyglądu z podglądem (klawisz G). Komendy: /femboy",
+	"description": "Zamienia skiny wszystkich graczy na femboyów, e-girls i catboyów – tylko u ciebie, po stronie klienta. Uszy, ogony, skrzydła, aureolki, różki, obroże, głaskanie i okno wyboru wyglądu z podglądem (klawisz G). Odgłosy pod klawiszami (miau, hau, mruczenie… – wiele wariantów) z głośnością i wyciszaniem pojedynczych graczy. Inni gracze z modem widzą twoje dodatki i głaskanie i słyszą twoje odgłosy. Komendy: /femboy",
 	"authors": [
 		"vsake"
 	],
+	"license": "MIT",
 	"icon": "assets/femboy/icon.png",
-	"environment": "client",
+	"environment": "*",
 	"entrypoints": {
+		"main": [
+			"pl.vsake.femboy.net.FemboyNet"
+		],
 		"client": [
 			"pl.vsake.femboy.FemboyMod"
 		]

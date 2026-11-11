@@ -1,5 +1,7 @@
 package pl.vsake.femboy.gui;
 
+import static pl.vsake.femboy.Lang.tr;
+
 import net.minecraft.client.MinecraftClient;
 import pl.vsake.femboy.FemboyConfig;
 import pl.vsake.femboy.FemboyMod;
@@ -63,7 +65,7 @@ public interface EditTarget {
 	static EditTarget everyoneTarget() {
 		return new EditTarget() {
 			public String label() {
-				return "Wszyscy";
+				return tr("Wszyscy");
 			}
 
 			public UUID uuid() {
@@ -151,7 +153,7 @@ public interface EditTarget {
 		boolean self = SkinManager.isSelf(id, name);
 		return new EditTarget() {
 			public String label() {
-				return self ? "Ja (" + name + ")" : name;
+				return self ? tr("Ja (") + name + ")" : name;
 			}
 
 			public UUID uuid() {

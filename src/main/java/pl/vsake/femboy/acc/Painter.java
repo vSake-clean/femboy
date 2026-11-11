@@ -2,7 +2,7 @@ package pl.vsake.femboy.acc;
 
 /**
  * Maluje teksturę dodatków (128x128 ARGB) dla jednego wyglądu: futro w kolorze z wyglądu z delikatnym
- * "włosiem", różowe środki uszu, złoty dzwoneczek, paski na zakolanówkach, plisy spódniczki itd.
+ * "włosiem", różowe środki uszu, złote dzwoneczki, dzianina szalika, plisy spódniczki itd.
  * Czysta Java – ten sam obraz trafia do gry i do podglądu poza grą.
  *
  * Ściany prostopadłościanu w teksturze (jak w vanilli, kawałek od (u,v), wymiary sx,sy,sz):
@@ -97,6 +97,43 @@ public final class Painter {
 				return furTex(fur, f, x, y, salt);
 			};
 		}
+		if (n.startsWith("jingle_")) return (f, x, y, w, h) -> {
+			if (t.equals("loop")) return SILVER;
+			if (t.equals("lip")) return f == Face.BOTTOM || f == Face.FRONT && x == 0 ? GOLD_DARK : mul(GOLD, 0.8f);
+			if (f == Face.TOP) return GOLD_LIGHT;
+			if (t.equals("body") && f == Face.FRONT) return x == 0 && y == 0 ? 0xFFF6C8 : y == h - 1 ? mul(GOLD, 0.85f) : GOLD;
+			return t.equals("dome") ? mix(GOLD, GOLD_LIGHT, 0.5f) : GOLD;
+		};
+		if (n.startsWith("earribbon_")) return (f, x, y, w, h) -> t.equals("knot") ? mul(acc, 0.72f) : matTex(acc, x, y, salt);
+		if (n.equals(Parts.ID_TAG)) return (f, x, y, w, h) -> {
+			if (t.equals("ring")) return SILVER;
+			if (t.startsWith("rivet")) return mul(SILVER, 0.7f);
+			// jasna blaszka z ciemniejszą ramką – napis (nick) rysuje gra na wierzchu
+			if (f == Face.FRONT) return x == 0 || y == 0 || x == w - 1 || y == h - 1 ? 0x9AA0AA : 0xE9ECF1;
+			return f == Face.BACK ? SILVER : 0x9AA0AA;
+		};
+		if (n.startsWith("scarf")) return (f, x, y, w, h) -> {
+			if (t.equals("fringe")) return x % 2 == 0 ? mix(acc, 0xFFFFFF, 0.45f) : mul(acc, 0.75f);
+			if (t.equals("knot")) return mul(matTex(acc, x, y, salt), 0.82f);
+			if (f == Face.TOP || f == Face.BOTTOM) return mul(acc, 0.85f);
+			// dzianina: co drugi rząd ciemniejszy, na końcach dwa jasne paski
+			int c = matTex(acc, x, y, salt);
+			if (t.equals("b") && (y == 0 || y == 2)) return mix(c, 0xFFFFFF, 0.5f);
+			return y % 2 == 1 ? mul(c, 0.88f) : c;
+		};
+		if (n.equals("toyrod")) return (f, x, y, w, h) -> t.equals("grip") ? matTex(acc, x, y, salt) : (x + y) % 3 == 0 ? 0x8A6238 : 0xA5784A;
+		if (n.equals("toystring")) return (f, x, y, w, h) -> y % 2 == 0 ? 0xF2F2F2 : 0xCFCFCF;
+		if (n.equals("toymouse")) return (f, x, y, w, h) -> {
+			if (t.startsWith("ear")) return f == Face.FRONT ? PINK : 0x8E8E96;
+			if (t.equals("tail")) return PINK_DARK;
+			if (f == Face.FRONT) return y == 1 && (x == 0 || x == w - 1) ? 0x1B1B20 : y == h - 1 && x >= 1 && x <= w - 2 ? PINK : 0xA9A9B2; // oczka i nosek
+			return f == Face.BOTTOM ? 0xD9D9DE : mul(0xA9A9B2, 1f + 0.05f * noise(x, y, salt));
+		};
+		if (n.equals("toyfeather")) return (f, x, y, w, h) -> {
+			if (t.equals("quill")) return 0xF4EFE2;
+			int c = matTex(acc, x, y, salt);
+			return x == w / 2 ? mix(c, 0xFFFFFF, 0.5f) : (x + y) % 2 == 0 ? c : mul(c, 0.86f); // stosina i „piórkowe” prążki
+		};
 		if (n.startsWith("tail_devil_")) return (f, x, y, w, h) -> {
 			int c = matTex(acc, x, y, salt);
 			return t.equals("spade") || t.equals("point") ? mul(c, 0.85f) : c;
@@ -175,15 +212,6 @@ public final class Painter {
 			if (f == Face.FRONT || f == Face.BACK) return inner ? mul(c, 0.8f) : y == 1 ? mix(c, 0xFFFFFF, 0.18f) : c;
 			return mul(c, 0.9f);
 		};
-		if (n.startsWith("sock_")) {
-			boolean stripes = look.has(Item.LEGS_STRIPES);
-			return (f, x, y, w, h) -> {
-				if (t.equals("cuff")) return stripes ? mul(acc, 0.92f) : mix(acc, 0xFFFFFF, 0.25f);
-				if (f == Face.BOTTOM) return mul(acc, 0.8f);
-				if (f == Face.TOP) return acc;
-				return stripes && (y % 2 == 0) ? WHITE : matTex(acc, x, y, salt);
-			};
-		}
 		if (n.startsWith("paw_")) return (f, x, y, w, h) -> {
 			if (t.equals("cuff")) return furTex(mix(fur, SNOW, 0.55f), f, x, y, salt);
 			if (f == Face.BOTTOM) {

@@ -13,6 +13,8 @@ import pl.vsake.femboy.SkinManager;
 import pl.vsake.femboy.acc.Accessories;
 import pl.vsake.femboy.acc.AccessoryRenderState;
 import pl.vsake.femboy.acc.Look;
+import pl.vsake.femboy.fx.Leash;
+import pl.vsake.femboy.fx.Reactions;
 
 /**
  * Nasze skiny mają włosy 3D, kaptur i spódniczkę na zewnętrznych warstwach –
@@ -35,13 +37,28 @@ public abstract class PlayerEntityRendererMixin {
 	@Inject(method = "updateRenderState(Lnet/minecraft/entity/PlayerLikeEntity;Lnet/minecraft/client/render/entity/state/PlayerEntityRenderState;F)V", at = @At("TAIL"))
 	private void femboy$accessories(PlayerLikeEntity entity, PlayerEntityRenderState state, float tickProgress, CallbackInfo ci) {
 		Look look = null;
+		AccessoryRenderState acc = (AccessoryRenderState) state;
 		if (entity instanceof AbstractClientPlayerEntity player) {
 			try {
 				look = Accessories.lookFor(player, state.skinTextures);
+				// reakcje uszu/ogona, emotka nad głową, smycz
+				Reactions.State r = acc.femboy$react();
+				Reactions.fill(player, r);
+				r.age = state.age;
+				r.pats = pl.vsake.femboy.pat.PatPat.count(player);
+				r.hunt = state.isInSneakingPose ? 1f : 0f;
+				Leash.fill(player, state, tickProgress);
+				// animacje ciała, mruganie / boop, pozy we dwoje (te mogą przestawić rysowaną postać), głowa za kropką lasera
+				pl.vsake.femboy.fx.Poses.fill(player, r);
+				pl.vsake.femboy.fx.Boop.fill(player, r, look);
+				pl.vsake.femboy.fx.Bonds.fill(player, state, r, tickProgress);
+				pl.vsake.femboy.fx.Toys.fill(player, state, r, look, tickProgress);
 			} catch (Throwable t) {
 				Accessories.failed(t);
 			}
+		} else {
+			acc.femboy$react().reset();
 		}
-		((AccessoryRenderState) state).femboy$setLook(look);
+		acc.femboy$setLook(look);
 	}
 }

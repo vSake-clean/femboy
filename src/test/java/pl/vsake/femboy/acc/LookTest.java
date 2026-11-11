@@ -187,7 +187,7 @@ class LookTest {
 	@Test
 	void animationOutputsAreFinite() {
 		Look l = Look.builder().seed(42).build();
-		float[] out = new float[6];
+		float[] out = new float[Anim.OUT];
 		Anim.In in = new Anim.In();
 		for (int step = 0; step < 400; step++) {
 			in.age = step * 1.7f;
@@ -198,13 +198,70 @@ class LookTest {
 			in.swimming = step % 13 == 0;
 			in.helmet = step % 5 == 0;
 			in.pat = step % 3 == 0 ? (step % 10) : -1f;
+			in.flat = step % 4 == 0 ? 1f : 0f;
+			in.perk = step % 6 == 0 ? 1f : 0f;
+			in.wag = step % 9 == 0 ? 1f : 0f;
+			in.puff = step % 8 == 0 ? 1f : 0f;
 			for (Parts.Piece p : Parts.PIECES) {
 				Anim.apply(p, l, in, out);
 				for (float v : out) assertTrue(Float.isFinite(v), p.name);
 				// nic nie obraca się o więcej niż ~pół obrotu na klatkę – to byłby błąd we wzorze
 				for (int i = 0; i < 3; i++) assertTrue(Math.abs(out[i]) < 3.2f, p.name + " kąt " + out[i]);
+				assertTrue(out[6] >= 0f && out[6] <= 1f, p.name + " pogrubienie " + out[6]);
 			}
 		}
+	}
+
+	@Test
+	void earsReactToHissAndMeow() {
+		Look l = Look.builder().set(Item.EARS_CAT).set(Item.TAIL_CAT).seed(7).build();
+		float[] calm = new float[Anim.OUT], flat = new float[Anim.OUT], perk = new float[Anim.OUT];
+		Parts.Piece ear = Parts.byName("ear_cat_l"), tail = Parts.byName("tail_cat_0");
+		Anim.In in = new Anim.In();
+		in.age = 1000.5f; // poza strzyżeniem uszkiem
+		while (Anim.twitch(in.age, l.seed, 1) != 0f) in.age += 1f;
+		Anim.apply(ear, l, in, calm);
+		in.flat = 1f;
+		in.puff = 1f;
+		Anim.apply(ear, l, in, flat);
+		float[] puffed = new float[Anim.OUT];
+		Anim.apply(tail, l, in, puffed);
+		in.flat = in.puff = 0f;
+		in.perk = 1f;
+		Anim.apply(ear, l, in, perk);
+		assertTrue(flat[0] < calm[0] - 0.5f, "syk: ucho kładzie się do tyłu");
+		assertTrue(flat[2] > calm[2] + 0.5f, "syk: lewe ucho rozkłada się na bok");
+		assertTrue(perk[4] < calm[4], "miau: ucho idzie w górę");
+		assertTrue(perk[2] < calm[2], "miau: ucho się prostuje");
+		assertTrue(puffed[6] > 0.3f, "syk: ogon nastroszony");
+	}
+
+	// ---------- 1.6: dzwoneczki, bez zakolanówek ----------
+
+	@Test
+	void bellItemsJingleAndCatsPurr() {
+		for (Item it : new Item[]{Item.NECK_BELL, Item.NECK_BELLS, Item.HEAD_BOW_BELL, Item.EARS_CAT_BELL})
+			assertTrue(Look.builder().set(it).build().hasBell(), it.toString());
+		assertFalse(Look.builder().set(Item.NECK_HEART).set(Item.HEAD_BOW).build().hasBell());
+		assertTrue(Look.builder().set(Item.EARS_CAT_BELL).build().isCat());
+		assertTrue(Look.builder().set(Item.TAIL_CAT).build().isCat());
+		assertFalse(Look.builder().set(Item.EARS_PUPPY).build().isCat());
+	}
+
+	@Test
+	void noSocksAnywhere() {
+		assertNull(Item.Slot.byId("legs"));
+		for (Item it : Item.values()) assertFalse(it.label.contains("zakolan"), it.toString());
+	}
+
+	@Test
+	void bellAndScarfItemsAppearInRandomLooks() {
+		Set<Item> seen = new HashSet<>();
+		for (long seed = 0; seed < 20000; seed++) seen.addAll(Kit.random(seed, List.of(Kit.values()), -1).items());
+		for (Item it : new Item[]{Item.EARS_CAT_BELL, Item.HEAD_BOW_BELL, Item.NECK_BELLS, Item.NECK_ID, Item.NECK_SCARF})
+			assertTrue(seen.contains(it), it + " nigdy nie wypada w losowaniu");
+		// stały efekt cząsteczek tylko z własnego wyboru – inaczej cały serwer by iskrzył
+		assertFalse(seen.contains(Item.FX_HEARTS) || seen.contains(Item.FX_SPARKLES));
 	}
 
 	@Test
